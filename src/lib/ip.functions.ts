@@ -321,7 +321,10 @@ export const getUserIP = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<IPInfo> => {
     const fallback = getRequestIP({ xForwardedFor: true }) ?? undefined;
     const forwarded = getRequestHeader("x-forwarded-for");
-    const ip = pickPreferredIP(forwarded, fallback);
+    const cfIP = getRequestHeader("cf-connecting-ip");
+    const cfPseudo = getRequestHeader("cf-pseudo-ipv4");
+    const combined = [cfPseudo, cfIP, forwarded].filter(Boolean).join(",");
+    const ip = pickPreferredIP(combined || undefined, fallback);
     if (!ip || ip === "::1" || ip === "127.0.0.1") {
       return { ip };
     }
