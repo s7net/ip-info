@@ -50,7 +50,7 @@ export function Globe() {
       className="pointer-events-none fixed inset-0 z-0 flex items-end justify-center overflow-hidden"
       aria-hidden
     >
-      <div className="relative aspect-square w-[min(180vh,160vw)] translate-y-1/2 opacity-40">
+      <div className="relative aspect-square w-[min(180vh,160vw)] translate-y-1/2 opacity-100">
         <canvas
           ref={canvasRef}
           style={{ width: "100%", height: "100%", contain: "layout paint size" }}
