@@ -41,6 +41,7 @@ export type AbuseInfo = {
 
 export type IPInfo = {
   ip: string | null;
+  host?: string | null;
   country?: string | null;
   country_code?: string | null;
   is_eu?: boolean | null;
