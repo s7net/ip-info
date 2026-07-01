@@ -5,18 +5,19 @@ export function Globe() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
     let phi = 0;
-    let width = 0;
+    let width = canvas.offsetWidth || 600;
     let raf = 0;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const onResize = () => {
-      if (canvasRef.current) width = canvasRef.current.offsetWidth;
+      if (canvas.offsetWidth) width = canvas.offsetWidth;
     };
     window.addEventListener("resize", onResize);
     onResize();
 
-    const globe = createGlobe(canvasRef.current, {
+    const globe = createGlobe(canvas, {
       devicePixelRatio: dpr,
       width: width * dpr,
       height: width * dpr,
@@ -31,6 +32,9 @@ export function Globe() {
       glowColor: [0.06, 0.35, 0.35],
       markers: [],
     });
+    // Reveal the canvas after first render tick to avoid a flash of blank white.
+    canvas.style.opacity = "0";
+    setTimeout(() => { canvas.style.opacity = "1"; }, 50);
 
     const tick = () => {
       phi += 0.003;
