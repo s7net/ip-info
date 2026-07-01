@@ -105,6 +105,52 @@ function Index() {
         { label: "Satellite", value: yn(active.is_satellite), icon: Satellite },
       ],
     },
+    {
+      title: "ASN / Network",
+      rows: [
+        { label: "ASN", value: a.asn, mono: true, icon: Network },
+        { label: "Route", value: a.route, mono: true, icon: RouteIcon },
+        { label: "Netname", value: a.netname, icon: Tag },
+        { label: "Name", value: a.name, icon: Building2 },
+        { label: "Country", value: a.country_code, icon: FlagIcon },
+        { label: "Domain", value: a.domain, icon: Globe },
+        { label: "Type", value: a.type, icon: Server },
+        { label: "RIR", value: a.rir, icon: Landmark },
+      ],
+    },
+    {
+      title: "Company",
+      rows: [
+        { label: "Name", value: c.name, icon: Building2 },
+        { label: "Domain", value: c.domain, icon: Globe },
+        { label: "Country", value: c.country_code, icon: FlagIcon },
+        { label: "Type", value: c.type, icon: Server },
+      ],
+    },
+    {
+      title: "Privacy",
+      rows: [
+        { label: "Abuser", value: yn(p.is_abuser), icon: ShieldAlert, highlight: !!p.is_abuser },
+        { label: "Anonymous", value: yn(p.is_anonymous), icon: Fingerprint, highlight: !!p.is_anonymous },
+        { label: "Bogon", value: yn(p.is_bogon), icon: ShieldAlert, highlight: !!p.is_bogon },
+        { label: "Hosting", value: yn(p.is_hosting), icon: Server, highlight: !!p.is_hosting },
+        { label: "iCloud Relay", value: yn(p.is_icloud_relay), icon: Radio, highlight: !!p.is_icloud_relay },
+        { label: "Proxy", value: yn(p.is_proxy), icon: ShieldAlert, highlight: !!p.is_proxy },
+        { label: "Tor", value: yn(p.is_tor), icon: ShieldAlert, highlight: !!p.is_tor },
+        { label: "VPN", value: yn(p.is_vpn), icon: ShieldAlert, highlight: !!p.is_vpn },
+      ],
+    },
+    {
+      title: "Abuse Contact",
+      rows: [
+        { label: "Name", value: ab.name, icon: User },
+        { label: "Email", value: ab.email, icon: Mail, mono: true },
+        { label: "Phone", value: ab.phone, icon: Phone, mono: true },
+        { label: "Address", value: ab.address, icon: Home },
+        { label: "Country", value: ab.country_code, icon: FlagIcon },
+        { label: "Network", value: ab.network, mono: true, icon: RouteIcon },
+      ],
+    },
   ];
 
   const lat = active.latitude;
