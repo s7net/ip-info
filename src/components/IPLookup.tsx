@@ -294,13 +294,13 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
             <div className="flex flex-col divide-y divide-border md:border-r md:border-border">
               {sections.filter(s => s.title === "Location" || s.title === "Abuse Contact").map((sec) => (
                 <div key={sec.title}>
-                  <div className="bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-primary sm:px-4 sm:py-1.5 sm:text-xs">
+                  <div className="bg-primary/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary sm:px-4 sm:py-1.5 sm:text-xs">
                     {sec.title}
                   </div>
                   {sec.rows.map((r) => (
-                    <div key={sec.title + r.label} className="grid grid-cols-[100px_1fr] items-center gap-2 border-t border-border/60 px-3 py-1.5 text-xs even:bg-muted/20 sm:grid-cols-[140px_1fr] sm:gap-3 sm:px-4 sm:py-2 sm:text-sm">
+                    <div key={sec.title + r.label} className="grid grid-cols-[90px_1fr] items-center gap-2 border-t border-border/60 px-3 py-1 text-[11px] even:bg-muted/20 sm:grid-cols-[140px_1fr] sm:gap-3 sm:px-4 sm:py-2 sm:text-sm">
                       <span className="flex items-center gap-1.5 text-muted-foreground sm:gap-2">
-                        <r.icon className="h-3.5 w-3.5 text-primary sm:h-4 sm:w-4" />
+                        <r.icon className="hidden h-4 w-4 text-primary sm:block" />
                         {r.label}
                       </span>
                       <span
