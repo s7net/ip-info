@@ -66,17 +66,17 @@ function Index() {
   };
 
   const rows: Array<{ label: string; value: string | null | undefined; mono?: boolean }> = [
-    { label: "آدرس IP", value: active.ip, mono: true },
+    { label: "IP Address", value: active.ip, mono: true },
     { label: "ASN", value: active.asn != null ? `AS${active.asn}` : null, mono: true },
-    { label: "سازمان (ISP)", value: active.org_name },
-    { label: "کشور", value: active.country ? `${active.country}${active.country_code ? ` (${active.country_code})` : ""}` : null },
-    { label: "منطقه", value: active.region },
-    { label: "شهر", value: active.city },
-    { label: "کد پستی", value: active.postal },
-    { label: "قاره", value: active.continent },
-    { label: "منطقه زمانی", value: active.timezone },
-    { label: "مختصات", value: active.latitude != null && active.longitude != null ? `${active.latitude}, ${active.longitude}` : null, mono: true },
-    { label: "شبکه Tor", value: active.is_tor == null ? null : active.is_tor ? "بله" : "خیر" },
+    { label: "Organization (ISP)", value: active.org_name },
+    { label: "Country", value: active.country ? `${active.country}${active.country_code ? ` (${active.country_code})` : ""}` : null },
+    { label: "Region", value: active.region },
+    { label: "City", value: active.city },
+    { label: "Postal Code", value: active.postal },
+    { label: "Continent", value: active.continent },
+    { label: "Timezone", value: active.timezone },
+    { label: "Coordinates", value: active.latitude != null && active.longitude != null ? `${active.latitude}, ${active.longitude}` : null, mono: true },
+    { label: "Tor Network", value: active.is_tor == null ? null : active.is_tor ? "Yes" : "No" },
   ];
 
   const lat = active.latitude;
@@ -91,17 +91,17 @@ function Index() {
       {/* Top bar */}
       <div className="border-b border-border/60 bg-card/40 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 text-sm">
-          <span className="text-muted-foreground">IP شما:</span>
+          <span className="text-muted-foreground">Your IP:</span>
           <span dir="ltr" className="rounded bg-primary/20 px-2 py-0.5 font-mono text-primary">
             {me?.ip ?? "—"}
           </span>
           {me?.country && (
             <span className="flex items-center gap-2 text-muted-foreground">
-              کشور:
+              Country:
               <Flag code={me.country_code} className="h-4 w-6 rounded-sm shadow-sm" />
               <span className="text-foreground">
                 {me.country}
-                {me.region || me.city ? ` (${[me.region, me.city].filter(Boolean).join("، ")})` : ""}
+                {me.region || me.city ? ` (${[me.region, me.city].filter(Boolean).join(", ")})` : ""}
               </span>
             </span>
           )}
@@ -113,62 +113,55 @@ function Index() {
         <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
           <form onSubmit={onSubmit} className="flex flex-wrap items-center gap-3">
             <div className="relative flex-1 min-w-[260px]">
-              <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 dir="ltr"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="IP یا آدرس مورد نظر (مثلاً 8.8.8.8)"
-                className="h-11 w-full rounded-md border border-input bg-background pr-10 pl-10 font-mono text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+                placeholder="Enter an IP address (e.g. 8.8.8.8)"
+                className="h-11 w-full rounded-md border border-input bg-background pl-10 pr-10 font-mono text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
               />
               {input && (
                 <button
                   type="button"
                   onClick={reset}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:bg-muted"
-                  aria-label="پاک کردن"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:bg-muted"
+                  aria-label="Clear"
                 >
                   <X className="h-4 w-4" />
                 </button>
               )}
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button type="submit" className="h-11 px-6">Info</Button>
-              {(["Ping", "HTTP", "TCP port", "UDP port", "DNS"] as const).map((t) => (
-                <Button key={t} type="button" variant="secondary" className="h-11 opacity-60" disabled>
-                  {t}
-                </Button>
-              ))}
-            </div>
+            <Button type="submit" className="h-11 px-6">Lookup</Button>
           </form>
         </div>
 
         {/* Header of result */}
         <div className="mt-6 rounded-t-lg border border-b-0 border-border bg-muted/40 px-4 py-3 text-center text-sm text-muted-foreground">
-          موقعیت آدرس IP: <span dir="ltr" className="font-mono text-foreground">{active.ip ?? "—"}</span>
+          IP location for: <span dir="ltr" className="font-mono text-foreground">{active.ip ?? "—"}</span>
         </div>
 
         <div className="rounded-b-lg border border-border bg-card">
           {lookupQ.isError && (
             <div className="border-b border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              IP نامعتبر است یا در حال حاضر امکان دریافت اطلاعات وجود ندارد.
+              Invalid IP address or lookup temporarily unavailable.
             </div>
           )}
           <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr]">
             {/* Info table */}
             <div className="divide-y divide-border">
               <div className="flex items-center justify-between gap-3 px-4 py-3">
-                <span className="text-sm font-semibold text-primary">اطلاعات IP</span>
+                <span className="text-sm font-semibold text-primary">IP Information</span>
                 <div className="flex items-center gap-2">
-                  {loading && <span className="text-xs text-muted-foreground">در حال بارگذاری…</span>}
+                  {loading && <span className="text-xs text-muted-foreground">Loading…</span>}
                   {active.ip && (
                     <button
                       onClick={copyIP}
                       className="inline-flex items-center gap-1 rounded border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted"
-                      aria-label="کپی IP"
+                      aria-label="Copy IP"
                     >
                       {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                      {copied ? "کپی شد" : "کپی"}
+                      {copied ? "Copied" : "Copy"}
                     </button>
                   )}
                 </div>
@@ -180,7 +173,7 @@ function Index() {
                     dir={r.mono ? "ltr" : undefined}
                     className={`text-foreground ${r.mono ? "font-mono" : ""} ${!r.value ? "text-muted-foreground/60" : ""}`}
                   >
-                    {r.label === "کشور" && active.country_code ? (
+                    {r.label === "Country" && active.country_code ? (
                       <span className="inline-flex items-center gap-2">
                         <Flag code={active.country_code} className="h-3.5 w-5 rounded-sm" />
                         {r.value ?? "—"}
@@ -194,7 +187,7 @@ function Index() {
             </div>
 
             {/* Map */}
-            <div className="min-h-[320px] border-t border-border md:border-r md:border-t-0">
+            <div className="min-h-[320px] border-t border-border md:border-l md:border-t-0">
               {mapUrl ? (
                 <iframe
                   key={mapUrl}
@@ -206,14 +199,14 @@ function Index() {
               ) : (
                 <div className="flex h-full min-h-[320px] items-center justify-center p-6 text-center text-sm text-muted-foreground">
                   {active.ip
-                    ? "مختصات جغرافیایی برای این IP در دسترس نیست."
-                    : "برای مشاهده روی نقشه، یک IP وارد کنید."}
+                    ? "Geolocation coordinates are not available for this IP."
+                    : "Enter an IP address to see it on the map."}
                 </div>
               )}
             </div>
           </div>
           <div className="border-t border-border px-4 py-2 text-center text-xs text-muted-foreground">
-            داده‌ها از <a href="https://api.ipiz.net" target="_blank" rel="noreferrer" className="text-primary hover:underline">ipiz.net</a> و نقشه از OpenStreetMap
+            Data from <a href="https://api.ipiz.net" target="_blank" rel="noreferrer" className="text-primary hover:underline">ipiz.net</a> · Map by OpenStreetMap
           </div>
         </div>
       </main>

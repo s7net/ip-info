@@ -77,11 +77,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "تشخیص IP | آدرس IP من" },
-      { name: "description", content: "آدرس IP عمومی خود را به صورت آنی و رایگان تشخیص دهید." },
+      { title: "IP Detector | What is my IP" },
+      { name: "description", content: "Detect your public IP address instantly and for free." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "تشخیص IP | آدرس IP من" },
-      { property: "og:description", content: "آدرس IP عمومی خود را به صورت آنی و رایگان تشخیص دهید." },
+      { property: "og:title", content: "IP Detector | What is my IP" },
+      { property: "og:description", content: "Detect your public IP address instantly and for free." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
@@ -102,7 +102,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="fa" dir="rtl" className="dark">
+    <html lang="en" dir="ltr" className="dark">
       <head>
         <HeadContent />
       </head>
