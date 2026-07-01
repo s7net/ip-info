@@ -234,7 +234,7 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
           )}
           <div
             key={contentKey}
-            className={`grid grid-cols-1 items-stretch md:grid-cols-2 transition-all duration-700 ease-out ${loading ? "opacity-30 blur-[2px]" : "opacity-100 blur-0"}`}
+            className={`grid grid-cols-1 items-stretch md:grid-cols-2 transition-all duration-500 ease-out ${loading ? "opacity-40 blur-[1px]" : "opacity-100 blur-0"}`}
           >
             <div className="col-span-1 md:col-span-2 flex items-center justify-between gap-3 border-b border-border px-4 py-3">
               <span className="text-sm font-semibold text-primary">IP Information</span>
