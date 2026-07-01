@@ -172,26 +172,26 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
     <div className="relative min-h-screen text-foreground">
       <GlobeBG />
       <div className="relative border-b border-border/60 bg-card/60 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 text-sm">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-1.5 text-xs sm:gap-x-4 sm:gap-y-2 sm:px-4 sm:py-2 sm:text-sm">
           <span className="text-muted-foreground">Your IP:</span>
           {me?.ip ? (
             <button
               type="button"
               onClick={() => navigate({ to: "/$ip", params: { ip: me.ip! } })}
               dir="ltr"
-              className="rounded bg-primary/20 px-2 py-0.5 font-mono text-primary underline-offset-2 hover:bg-primary/30 hover:underline transition"
+              className="rounded bg-primary/20 px-1.5 py-0.5 font-mono text-primary underline-offset-2 hover:bg-primary/30 hover:underline transition sm:px-2"
               aria-label="Lookup your IP"
             >
               {me.ip}
             </button>
           ) : (
-            <span dir="ltr" className="rounded bg-primary/20 px-2 py-0.5 font-mono text-primary">—</span>
+            <span dir="ltr" className="rounded bg-primary/20 px-1.5 py-0.5 font-mono text-primary sm:px-2">—</span>
           )}
           {me?.country && (
-            <span className="flex items-center gap-2 text-muted-foreground">
+            <span className="flex items-center gap-1.5 text-muted-foreground sm:gap-2">
               Country:
-              <Flag code={me.country_code} className="h-4 w-6 rounded-sm shadow-sm" />
-              <span className="text-foreground">
+              <Flag code={me.country_code} className="h-3 w-4 rounded-sm shadow-sm sm:h-4 sm:w-6" />
+              <span className="text-foreground truncate max-w-[140px] sm:max-w-none">
                 {me.country}
                 {me.subdivision || me.city ? ` (${[me.subdivision, me.city].filter(Boolean).join(", ")})` : ""}
               </span>
@@ -200,17 +200,17 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
         </div>
       </div>
 
-      <main className="relative mx-auto max-w-6xl px-4 py-6">
-        <div className="rounded-lg border border-border bg-card/80 p-4 shadow-sm backdrop-blur">
-          <form onSubmit={onSubmit} className="flex flex-wrap items-center gap-3">
-            <div className="relative flex-1 min-w-[260px]">
+      <main className="relative mx-auto max-w-6xl px-3 py-4 sm:px-4 sm:py-6">
+        <div className="rounded-lg border border-border bg-card/80 p-3 shadow-sm backdrop-blur sm:p-4">
+          <form onSubmit={onSubmit} className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+            <div className="relative flex-1 min-w-0 sm:min-w-[260px]">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 dir="ltr"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Enter an IP or domain (e.g. 8.8.8.8 or example.com)"
-                className="h-11 w-full rounded-md border border-input bg-background pl-10 pr-10 font-mono text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+                placeholder="Enter an IP or domain (e.g. 8.8.8.8)"
+                className="h-10 w-full rounded-md border border-input bg-background pl-10 pr-9 font-mono text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30 sm:h-11 sm:pr-10 sm:text-base"
               />
               {input && (
                 <button
@@ -223,28 +223,30 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
                 </button>
               )}
             </div>
-            <Select value={provider} onValueChange={(v) => setProvider(v as ProviderId)}>
-              <SelectTrigger
-                dir="ltr"
-                aria-label="Data source"
-                className="h-11 w-[210px] gap-2 border-input bg-background/60 font-mono text-sm hover:bg-background focus:ring-2 focus:ring-primary/30"
-              >
-                <Database className="h-4 w-4 text-primary" />
-                <SelectValue placeholder="Data source" />
-              </SelectTrigger>
-              <SelectContent dir="ltr" className="font-mono">
-                {PROVIDERS.map((p) => (
-                  <SelectItem key={p.id} value={p.id} className="text-sm">
-                    {p.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button type="submit" className="h-11 px-6">Lookup</Button>
+            <div className="flex gap-2 sm:flex-wrap sm:items-center">
+              <Select value={provider} onValueChange={(v) => setProvider(v as ProviderId)}>
+                <SelectTrigger
+                  dir="ltr"
+                  aria-label="Data source"
+                  className="h-10 flex-1 gap-2 border-input bg-background/60 font-mono text-xs hover:bg-background focus:ring-2 focus:ring-primary/30 sm:h-11 sm:w-[210px] sm:text-sm"
+                >
+                  <Database className="h-4 w-4 text-primary" />
+                  <SelectValue placeholder="Data source" />
+                </SelectTrigger>
+                <SelectContent dir="ltr" className="font-mono">
+                  {PROVIDERS.map((p) => (
+                    <SelectItem key={p.id} value={p.id} className="text-xs sm:text-sm">
+                      {p.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button type="submit" className="h-10 px-4 text-sm sm:h-11 sm:px-6">Lookup</Button>
+            </div>
           </form>
         </div>
 
-        <div className="mt-6 rounded-t-lg border border-b-0 border-border bg-muted/60 px-4 py-3 text-center text-sm text-muted-foreground backdrop-blur">
+        <div className="mt-4 rounded-t-lg border border-b-0 border-border bg-muted/60 px-3 py-2 text-center text-xs text-muted-foreground backdrop-blur sm:mt-6 sm:px-4 sm:py-3 sm:text-sm">
           IP location for:{" "}
           {active.host && (
             <>
@@ -257,15 +259,15 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
 
         <div className="relative rounded-b-lg border border-border bg-card/85 backdrop-blur">
           {loading && (
-            <div className="pointer-events-none absolute inset-0 z-10 flex items-start justify-center pt-24">
-              <div className="flex items-center gap-2 rounded-full border border-border bg-card/90 px-4 py-2 text-sm text-primary shadow-lg backdrop-blur animate-fade-in">
-                <Loader2 className="h-4 w-4 animate-spin" />
+            <div className="pointer-events-none absolute inset-0 z-10 flex items-start justify-center pt-16 sm:pt-24">
+              <div className="flex items-center gap-2 rounded-full border border-border bg-card/90 px-3 py-1.5 text-xs text-primary shadow-lg backdrop-blur animate-fade-in sm:px-4 sm:py-2 sm:text-sm">
+                <Loader2 className="h-3.5 w-3.5 animate-spin sm:h-4 sm:w-4" />
                 Loading…
               </div>
             </div>
           )}
           {lookupQ.isError && (
-            <div className="border-b border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            <div className="border-b border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive sm:px-4 sm:py-3 sm:text-sm">
               Invalid IP address or lookup temporarily unavailable.
             </div>
           )}
@@ -273,13 +275,13 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
             key={contentKey}
             className={`grid grid-cols-1 items-stretch md:grid-cols-2 transition-all duration-500 ease-out ${loading ? "opacity-40 blur-[1px]" : "opacity-100 blur-0"}`}
           >
-            <div className="col-span-1 md:col-span-2 flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-              <span className="text-sm font-semibold text-primary">IP Information</span>
+            <div className="col-span-1 md:col-span-2 flex items-center justify-between gap-3 border-b border-border px-3 py-2 sm:px-4 sm:py-3">
+              <span className="text-xs font-semibold text-primary sm:text-sm">IP Information</span>
               <div className="flex items-center gap-2">
                 {active.ip && (
                   <button
                     onClick={copyIP}
-                    className="inline-flex items-center gap-1 rounded border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted"
+                    className="inline-flex items-center gap-1 rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground hover:bg-muted sm:px-2 sm:py-1 sm:text-xs"
                     aria-label="Copy IP"
                   >
                     {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
@@ -292,13 +294,13 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
             <div className="flex flex-col divide-y divide-border md:border-r md:border-border">
               {sections.filter(s => s.title === "Location" || s.title === "Abuse Contact").map((sec) => (
                 <div key={sec.title}>
-                  <div className="bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+                  <div className="bg-primary/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary sm:px-4 sm:py-1.5 sm:text-xs">
                     {sec.title}
                   </div>
                   {sec.rows.map((r) => (
-                    <div key={sec.title + r.label} className="grid grid-cols-[140px_1fr] items-center gap-3 border-t border-border/60 px-4 py-2 text-sm even:bg-muted/20">
-                      <span className="flex items-center gap-2 text-muted-foreground">
-                        <r.icon className="h-4 w-4 text-primary" />
+                    <div key={sec.title + r.label} className="grid grid-cols-[90px_1fr] items-center gap-2 border-t border-border/60 px-3 py-1 text-[11px] even:bg-muted/20 sm:grid-cols-[140px_1fr] sm:gap-3 sm:px-4 sm:py-2 sm:text-sm">
+                      <span className="flex items-center gap-1.5 text-muted-foreground sm:gap-2">
+                        <r.icon className="hidden h-4 w-4 text-primary sm:block" />
                         {r.label}
                       </span>
                       <span
@@ -306,8 +308,8 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
                         className={`${r.highlight ? "font-semibold text-foreground" : "text-foreground"} ${r.mono ? "font-mono" : ""} ${!r.value ? "text-muted-foreground/60" : ""} break-all`}
                       >
                         {(r.label === "Country" && (sec.title === "Location" ? active.country_code : r.value)) ? (
-                          <span className="inline-flex items-center gap-2">
-                            <Flag code={sec.title === "Location" ? active.country_code : r.value} className="h-3.5 w-5 rounded-sm" />
+                          <span className="inline-flex items-center gap-1.5 sm:gap-2">
+                            <Flag code={sec.title === "Location" ? active.country_code : r.value} className="h-3 w-4 rounded-sm sm:h-3.5 sm:w-5" />
                             {r.value ?? "—"}
                           </span>
                         ) : (
@@ -324,13 +326,13 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
             <div className="flex flex-col divide-y divide-border">
               {sections.filter(s => s.title !== "Location" && s.title !== "Abuse Contact").map((sec) => (
                 <div key={sec.title}>
-                  <div className="bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+                  <div className="bg-primary/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary sm:px-4 sm:py-1.5 sm:text-xs">
                     {sec.title}
                   </div>
                   {sec.rows.map((r) => (
-                    <div key={sec.title + r.label} className="grid grid-cols-[140px_1fr] items-center gap-3 border-t border-border/60 px-4 py-2 text-sm even:bg-muted/20">
-                      <span className="flex items-center gap-2 text-muted-foreground">
-                        <r.icon className="h-4 w-4 text-primary" />
+                    <div key={sec.title + r.label} className="grid grid-cols-[90px_1fr] items-center gap-2 border-t border-border/60 px-3 py-1 text-[11px] even:bg-muted/20 sm:grid-cols-[140px_1fr] sm:gap-3 sm:px-4 sm:py-2 sm:text-sm">
+                      <span className="flex items-center gap-1.5 text-muted-foreground sm:gap-2">
+                        <r.icon className="hidden h-4 w-4 text-primary sm:block" />
                         {r.label}
                       </span>
                       <span
@@ -338,8 +340,8 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
                         className={`${r.highlight ? "font-semibold text-foreground" : "text-foreground"} ${r.mono ? "font-mono" : ""} ${!r.value ? "text-muted-foreground/60" : ""} break-all`}
                       >
                         {(r.label === "Country" && r.value) ? (
-                          <span className="inline-flex items-center gap-2">
-                            <Flag code={r.value} className="h-3.5 w-5 rounded-sm" />
+                          <span className="inline-flex items-center gap-1.5 sm:gap-2">
+                            <Flag code={r.value} className="h-3 w-4 rounded-sm sm:h-3.5 sm:w-5" />
                             {r.value ?? "—"}
                           </span>
                         ) : (
@@ -353,7 +355,7 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
               <div className="flex-1 border-t border-border/60 bg-muted/10" />
             </div>
 
-            <div className="col-span-1 md:col-span-2 border-t border-border h-64 bg-background">
+            <div className="col-span-1 md:col-span-2 border-t border-border h-40 bg-background sm:h-64">
               {mapUrl ? (
                 <iframe
                   key={mapUrl}
@@ -364,7 +366,7 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
                   loading="lazy"
                 />
               ) : (
-                <div className="flex h-full items-center justify-center p-6 text-center text-sm text-muted-foreground">
+                <div className="flex h-full items-center justify-center p-4 text-center text-xs text-muted-foreground sm:p-6 sm:text-sm">
                   {active.ip
                     ? "Geolocation coordinates are not available for this IP."
                     : "Enter an IP address to see it on the map."}
@@ -372,7 +374,7 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
               )}
             </div>
           </div>
-          <div className="border-t border-border px-4 py-2 text-center text-xs text-muted-foreground">
+          <div className="border-t border-border px-3 py-1.5 text-center text-[10px] text-muted-foreground sm:px-4 sm:py-2 sm:text-xs">
             Data from <span className="text-primary">{active.source ?? "iplocate.io"}</span> · Map by OpenStreetMap
           </div>
         </div>
