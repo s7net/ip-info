@@ -34,7 +34,7 @@ export function Globe() {
     });
 
     const tick = () => {
-      phi += 0.003;
+      phi += 0.0012;
       globe.update({ phi, width: width * dpr, height: width * dpr });
       raf = requestAnimationFrame(tick);
     };
