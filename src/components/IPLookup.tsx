@@ -160,7 +160,7 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
   const lon = active.longitude;
   const mapUrl =
     lat != null && lon != null
-      ? `https://www.openstreetmap.org/export/embed.html?bbox=${lon - 2},${lat - 1.2},${lon + 2},${lat + 1.2}&layer=mapnik&marker=${lat},${lon}`
+      ? `https://maps.google.com/maps?q=${lat},${lon}&z=6&hl=en&output=embed`
       : null;
 
   const contentKey = active.ip ?? "empty";
@@ -196,7 +196,7 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
                 dir="ltr"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Enter an IP address (e.g. 8.8.8.8)"
+                placeholder="Enter an IP or domain (e.g. 8.8.8.8 or example.com)"
                 className="h-11 w-full rounded-md border border-input bg-background pl-10 pr-10 font-mono text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
               />
               {input && (
@@ -215,7 +215,14 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
         </div>
 
         <div className="mt-6 rounded-t-lg border border-b-0 border-border bg-muted/60 px-4 py-3 text-center text-sm text-muted-foreground backdrop-blur">
-          IP location for: <span dir="ltr" className="font-mono text-foreground">{active.ip ?? "—"}</span>
+          IP location for:{" "}
+          {active.host && (
+            <>
+              <span dir="ltr" className="font-mono text-foreground">{active.host}</span>
+              {" "}<span className="text-muted-foreground/70">→</span>{" "}
+            </>
+          )}
+          <span dir="ltr" className="font-mono text-foreground">{active.ip ?? "—"}</span>
         </div>
 
         <div className="relative rounded-b-lg border border-border bg-card/85 backdrop-blur">
@@ -323,7 +330,6 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
                   title="Map"
                   src={mapUrl}
                   className="h-full w-full"
-                  style={{ filter: "invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9)" }}
                   loading="lazy"
                 />
               ) : (
