@@ -338,7 +338,7 @@ async function resolveDomainDoH(host: string): Promise<string | null> {
     "https://dns.google/resolve",
   ];
   for (const base of endpoints) {
-    for (const type of ["A", "AAAA"]) {
+    for (const type of ["A"]) {
       try {
         const res = await fetch(
           `${base}?name=${encodeURIComponent(host)}&type=${type}`,
