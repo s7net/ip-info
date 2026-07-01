@@ -24,17 +24,14 @@ export function Globe() {
       phi: 0,
       theta: 0.25,
       dark: 1,
-      diffuse: 1.2,
+      diffuse: 3,
       mapSamples: 16000,
-      mapBrightness: 6,
-      baseColor: [0.05, 0.15, 0.16],
-      markerColor: [0.15, 0.85, 0.78],
-      glowColor: [0.06, 0.35, 0.35],
+      mapBrightness: 8,
+      baseColor: [0.3, 0.9, 0.85],
+      markerColor: [0.2, 1, 0.9],
+      glowColor: [0.15, 0.7, 0.65],
       markers: [],
     });
-    // Reveal the canvas after first render tick to avoid a flash of blank white.
-    canvas.style.opacity = "0";
-    setTimeout(() => { canvas.style.opacity = "1"; }, 50);
 
     const tick = () => {
       phi += 0.003;
