@@ -3,20 +3,18 @@ import createGlobe from "cobe";
 
 export function Globe() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const pointerInteracting = useRef<number | null>(null);
-  const pointerInteractionMovement = useRef(0);
 
   useEffect(() => {
     if (!canvasRef.current) return;
     let phi = 0;
     let width = 0;
+    let raf = 0;
     const onResize = () => {
       if (canvasRef.current) width = canvasRef.current.offsetWidth;
     };
     window.addEventListener("resize", onResize);
     onResize();
 
-    // Teal color like the site (approx oklch turquoise -> rgb)
     const globe = createGlobe(canvasRef.current, {
       devicePixelRatio: 2,
       width: width * 2,
@@ -31,17 +29,17 @@ export function Globe() {
       markerColor: [0.15, 0.85, 0.78],
       glowColor: [0.06, 0.35, 0.35],
       markers: [],
-      onRender: (state) => {
-        if (pointerInteracting.current === null) {
-          phi += 0.003;
-        }
-        state.phi = phi + pointerInteractionMovement.current;
-        state.width = width * 2;
-        state.height = width * 2;
-      },
     });
 
+    const tick = () => {
+      phi += 0.003;
+      globe.update({ phi, width: width * 2, height: width * 2 });
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+
     return () => {
+      cancelAnimationFrame(raf);
       globe.destroy();
       window.removeEventListener("resize", onResize);
     };
