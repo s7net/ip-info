@@ -4,10 +4,9 @@ import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import {
   Search, X, Copy, Check,
-  Globe, Network, Building2, Flag as FlagIcon, Map, MapPin,
-  Mailbox, Earth, Clock, Compass, ShieldAlert,
-  DollarSign, Phone, Satellite, Radio, Route as RouteIcon,
-  Server, Tag, Landmark, AtSign, Mail, User, Home, Fingerprint,
+  Globe, Flag as FlagIcon, Map, MapPin,
+  Mailbox, Earth, Clock, Compass,
+  DollarSign, Phone, Satellite, Radio, Landmark,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
