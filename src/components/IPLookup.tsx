@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Database } from "lucide-react";
 import { getUserIP, lookupIP, PROVIDERS, type IPInfo, type ProviderId } from "@/lib/ip.functions";
 import { Globe as GlobeBG } from "@/components/Globe";
 import { hasFlag } from "country-flag-icons";
@@ -222,18 +224,23 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
               )}
             </div>
             <Button type="submit" className="h-11 px-6">Lookup</Button>
-            <select
-              value={provider}
-              onChange={(e) => setProvider(e.target.value as ProviderId)}
-              dir="ltr"
-              className="h-11 rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
-              aria-label="Provider"
-              title="Data source"
-            >
-              {PROVIDERS.map((p) => (
-                <option key={p.id} value={p.id}>{p.label}</option>
-              ))}
-            </select>
+            <Select value={provider} onValueChange={(v) => setProvider(v as ProviderId)}>
+              <SelectTrigger
+                dir="ltr"
+                aria-label="Data source"
+                className="h-11 w-[210px] gap-2 border-input bg-background/60 font-mono text-sm hover:bg-background focus:ring-2 focus:ring-primary/30"
+              >
+                <Database className="h-4 w-4 text-primary" />
+                <SelectValue placeholder="Data source" />
+              </SelectTrigger>
+              <SelectContent dir="ltr" className="font-mono">
+                {PROVIDERS.map((p) => (
+                  <SelectItem key={p.id} value={p.id} className="text-sm">
+                    {p.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </form>
         </div>
 
