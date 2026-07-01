@@ -113,33 +113,26 @@ function Index() {
         <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
           <form onSubmit={onSubmit} className="flex flex-wrap items-center gap-3">
             <div className="relative flex-1 min-w-[260px]">
-              <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 dir="ltr"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="IP یا آدرس مورد نظر (مثلاً 8.8.8.8)"
-                className="h-11 w-full rounded-md border border-input bg-background pr-10 pl-10 font-mono text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+                placeholder="Enter an IP address (e.g. 8.8.8.8)"
+                className="h-11 w-full rounded-md border border-input bg-background pl-10 pr-10 font-mono text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
               />
               {input && (
                 <button
                   type="button"
                   onClick={reset}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:bg-muted"
-                  aria-label="پاک کردن"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:bg-muted"
+                  aria-label="Clear"
                 >
                   <X className="h-4 w-4" />
                 </button>
               )}
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button type="submit" className="h-11 px-6">Info</Button>
-              {(["Ping", "HTTP", "TCP port", "UDP port", "DNS"] as const).map((t) => (
-                <Button key={t} type="button" variant="secondary" className="h-11 opacity-60" disabled>
-                  {t}
-                </Button>
-              ))}
-            </div>
+            <Button type="submit" className="h-11 px-6">Lookup</Button>
           </form>
         </div>
 
