@@ -181,7 +181,7 @@ async function lookupIpapiCo(ip: string): Promise<Partial<IPInfo> | null> {
 async function lookupIpApi(ip: string): Promise<Partial<IPInfo> | null> {
   try {
     const res = await fetch(
-      `https://ip-api.com/json/${ip}?fields=status,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,mobile,proxy,hosting,continent`,
+      `http://ip-api.com/json/${ip}?fields=status,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,mobile,proxy,hosting,continent`,
       { headers: { accept: "application/json" } },
     );
     if (!res.ok) return null;
@@ -311,42 +311,27 @@ export const getUserIP = createServerFn({ method: "GET" })
 const IP_RE = /^([0-9a-fA-F:.]{3,45})$/;
 const DOMAIN_RE = /^(?=.{1,253}$)([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
 
-async function resolveDomainCheckHost(host: string): Promise<string | null> {
-  try {
-    const start = await fetch(
-      `https://check-host.net/check-dns?host=${encodeURIComponent(host)}&max_nodes=1`,
-      { headers: { Accept: "application/json" } },
-    );
-    if (!start.ok) return null;
-    const startData = (await start.json()) as { request_id?: string };
-    const id = startData.request_id;
-    if (!id) return null;
-    for (let i = 0; i < 10; i++) {
-      await new Promise((r) => setTimeout(r, 700));
-      const res = await fetch(`https://check-host.net/check-result/${id}`, {
-        headers: { Accept: "application/json" },
-      });
-      if (!res.ok) continue;
-      const data = (await res.json()) as Record<string, unknown>;
-      let pending = false;
-      for (const node of Object.values(data)) {
-        if (node == null) {
-          pending = true;
-          continue;
-        }
-        const arr = Array.isArray(node) ? node : [node];
-        for (const item of arr) {
-          const rec = item as { A?: string[]; AAAA?: string[] } | null;
-          if (rec?.A?.length) return rec.A[0];
-          if (rec?.AAAA?.length) return rec.AAAA[0];
-        }
-      }
-      if (!pending) break;
+async function resolveDomainDoH(host: string): Promise<string | null> {
+  const endpoints = [
+    "https://cloudflare-dns.com/dns-query",
+    "https://dns.google/resolve",
+  ];
+  for (const base of endpoints) {
+    for (const type of ["A", "AAAA"]) {
+      try {
+        const res = await fetch(
+          `${base}?name=${encodeURIComponent(host)}&type=${type}`,
+          { headers: { accept: "application/dns-json" } },
+        );
+        if (!res.ok) continue;
+        const d = (await res.json()) as { Answer?: { type: number; data: string }[] };
+        const wantType = type === "A" ? 1 : 28;
+        const ans = d.Answer?.find((a) => a.type === wantType);
+        if (ans?.data) return ans.data;
+      } catch { /* try next */ }
     }
-    return null;
-  } catch {
-    return null;
   }
+  return null;
 }
 
 export const lookupIP = createServerFn({ method: "GET" })
@@ -363,8 +348,8 @@ export const lookupIP = createServerFn({ method: "GET" })
     let host: string | null = null;
     if (!IP_RE.test(target)) {
       host = target;
-      const resolved = await resolveDomainCheckHost(target);
-      if (!resolved) throw new Error("Could not resolve domain via check-host.net");
+      const resolved = await resolveDomainDoH(target);
+      if (!resolved) throw new Error("Could not resolve domain");
       target = resolved;
     }
     const info = await lookup(target, data.provider);
