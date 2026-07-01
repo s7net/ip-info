@@ -255,11 +255,11 @@ function Index() {
                         <r.icon className="h-4 w-4 text-primary" />
                         {r.label}
                       </span>
-                      <span
-                        dir={r.mono ? "ltr" : undefined}
-                        className={`${r.highlight ? "font-semibold text-destructive" : "text-foreground"} ${r.mono ? "font-mono" : ""} ${!r.value ? "text-muted-foreground/60" : ""} break-all`}
-                      >
-                        {(r.label === "Country" && active.country_code) ? (
+                       <span
+                         dir={r.mono ? "ltr" : undefined}
+                         className={`${r.highlight ? "font-semibold text-foreground" : "text-foreground"} ${r.mono ? "font-mono" : ""} ${!r.value ? "text-muted-foreground/60" : ""} break-all`}
+                       >
+                         {(r.label === "Country" && active.country_code) ? (
                           <span className="inline-flex items-center gap-2">
                             <Flag code={active.country_code} className="h-3.5 w-5 rounded-sm" />
                             {r.value ?? "—"}
@@ -288,11 +288,11 @@ function Index() {
                         <r.icon className="h-4 w-4 text-primary" />
                         {r.label}
                       </span>
-                      <span
-                        dir={r.mono ? "ltr" : undefined}
-                        className={`${r.highlight ? "font-semibold text-destructive" : "text-foreground"} ${r.mono ? "font-mono" : ""} ${!r.value ? "text-muted-foreground/60" : ""} break-all`}
-                      >
-                        {(r.label === "Country" && r.value) ? (
+                       <span
+                         dir={r.mono ? "ltr" : undefined}
+                         className={`${r.highlight ? "font-semibold text-foreground" : "text-foreground"} ${r.mono ? "font-mono" : ""} ${!r.value ? "text-muted-foreground/60" : ""} break-all`}
+                       >
+                         {(r.label === "Country" && r.value) ? (
                           <span className="inline-flex items-center gap-2">
                             <Flag code={r.value} className="h-3.5 w-5 rounded-sm" />
                             {r.value ?? "—"}
@@ -309,13 +309,14 @@ function Index() {
             </div>
 
             {/* Map */}
-            <div className="col-span-1 md:col-span-2 border-t border-border h-64">
+            <div className="col-span-1 md:col-span-2 border-t border-border h-64 bg-background">
               {mapUrl ? (
                 <iframe
                   key={mapUrl}
                   title="Map"
                   src={mapUrl}
                   className="h-full w-full"
+                  style={{ filter: "invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9)" }}
                   loading="lazy"
                 />
               ) : (
