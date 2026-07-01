@@ -240,7 +240,7 @@ function Index() {
               </div>
             </div>
 
-            {/* Left: Location */}
+            {/* Left: Location + Abuse Contact */}
             <div className="divide-y divide-border md:border-r md:border-border">
               {sections.filter(s => s.title === "Location").map((sec) => (
                 <div key={sec.title}>
