@@ -56,3 +56,16 @@ export const getUserIP = createServerFn({ method: "GET" }).handler(async (): Pro
   const info = await lookup(ip);
   return { ip, ...info };
 });
+
+const IP_RE = /^([0-9a-fA-F:.]{3,45})$/;
+
+export const lookupIP = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) => {
+    const { ip } = input as { ip: string };
+    if (!ip || !IP_RE.test(ip)) throw new Error("Invalid IP");
+    return { ip };
+  })
+  .handler(async ({ data }): Promise<IPInfo> => {
+    const info = await lookup(data.ip);
+    return { ip: data.ip, ...info };
+  });
