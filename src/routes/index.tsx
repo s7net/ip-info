@@ -162,7 +162,7 @@ function Index() {
       : null;
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground">
+    <div className="relative min-h-screen text-foreground">
       <GlobeBG />
       {/* Top bar */}
       <div className="relative border-b border-border/60 bg-card/60 backdrop-blur">
