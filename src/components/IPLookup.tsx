@@ -196,7 +196,7 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
                 dir="ltr"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Enter an IP address (e.g. 8.8.8.8)"
+                placeholder="Enter an IP or domain (e.g. 8.8.8.8 or example.com)"
                 className="h-11 w-full rounded-md border border-input bg-background pl-10 pr-10 font-mono text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
               />
               {input && (
@@ -323,7 +323,6 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
                   title="Map"
                   src={mapUrl}
                   className="h-full w-full"
-                  style={{ filter: "invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9)" }}
                   loading="lazy"
                 />
               ) : (
