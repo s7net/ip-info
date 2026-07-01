@@ -272,9 +272,9 @@ function Index() {
               ))}
             </div>
 
-            {/* Right: ASN / Company / Privacy / Abuse */}
+            {/* Right: ASN / Company / Privacy */}
             <div className="divide-y divide-border">
-              {sections.filter(s => s.title !== "Location").map((sec) => (
+              {sections.filter(s => s.title !== "Location" && s.title !== "Abuse Contact").map((sec) => (
                 <div key={sec.title}>
                   <div className="bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
                     {sec.title}
