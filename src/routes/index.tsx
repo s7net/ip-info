@@ -4,10 +4,9 @@ import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import {
   Search, X, Copy, Check,
-  Globe, Network, Building2, Flag as FlagIcon, Map, MapPin,
-  Mailbox, Earth, Clock, Compass, ShieldAlert,
-  DollarSign, Phone, Satellite, Radio, Route as RouteIcon,
-  Server, Tag, Landmark, AtSign, Mail, User, Home, Fingerprint,
+  Globe, Flag as FlagIcon, Map, MapPin,
+  Mailbox, Earth, Clock, Compass,
+  DollarSign, Phone, Satellite, Radio, Landmark,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -72,10 +71,6 @@ function Index() {
   };
 
   const yn = (v: boolean | null | undefined) => v == null ? null : v ? "Yes" : "No";
-  const p = active.privacy ?? {};
-  const a = active.asn ?? {};
-  const c = active.company ?? {};
-  const ab = active.abuse ?? {};
 
   type Row = {
     label: string;
@@ -103,52 +98,6 @@ function Index() {
         { label: "Calling Code", value: active.calling_code ? `+${active.calling_code}` : null, icon: Phone },
         { label: "Anycast", value: yn(active.is_anycast), icon: Radio },
         { label: "Satellite", value: yn(active.is_satellite), icon: Satellite },
-      ],
-    },
-    {
-      title: "ASN / Network",
-      rows: [
-        { label: "ASN", value: a.asn, mono: true, icon: Network },
-        { label: "Route", value: a.route, mono: true, icon: RouteIcon },
-        { label: "Netname", value: a.netname, icon: Tag },
-        { label: "Name", value: a.name, icon: Building2 },
-        { label: "Country", value: a.country_code, icon: FlagIcon },
-        { label: "Domain", value: a.domain, icon: Globe },
-        { label: "Type", value: a.type, icon: Server },
-        { label: "RIR", value: a.rir, icon: Landmark },
-      ],
-    },
-    {
-      title: "Company",
-      rows: [
-        { label: "Name", value: c.name, icon: Building2 },
-        { label: "Domain", value: c.domain, icon: Globe },
-        { label: "Country", value: c.country_code, icon: FlagIcon },
-        { label: "Type", value: c.type, icon: Server },
-      ],
-    },
-    {
-      title: "Privacy",
-      rows: [
-        { label: "Abuser", value: yn(p.is_abuser), icon: ShieldAlert, highlight: !!p.is_abuser },
-        { label: "Anonymous", value: yn(p.is_anonymous), icon: Fingerprint, highlight: !!p.is_anonymous },
-        { label: "Bogon", value: yn(p.is_bogon), icon: ShieldAlert, highlight: !!p.is_bogon },
-        { label: "Hosting", value: yn(p.is_hosting), icon: Server, highlight: !!p.is_hosting },
-        { label: "iCloud Relay", value: yn(p.is_icloud_relay), icon: Radio, highlight: !!p.is_icloud_relay },
-        { label: "Proxy", value: yn(p.is_proxy), icon: ShieldAlert, highlight: !!p.is_proxy },
-        { label: "Tor", value: yn(p.is_tor), icon: ShieldAlert, highlight: !!p.is_tor },
-        { label: "VPN", value: yn(p.is_vpn), icon: ShieldAlert, highlight: !!p.is_vpn },
-      ],
-    },
-    {
-      title: "Abuse Contact",
-      rows: [
-        { label: "Name", value: ab.name, icon: User },
-        { label: "Email", value: ab.email, icon: Mail, mono: true },
-        { label: "Phone", value: ab.phone, icon: Phone, mono: true },
-        { label: "Address", value: ab.address, icon: Home },
-        { label: "Country", value: ab.country_code, icon: FlagIcon },
-        { label: "Network", value: ab.network, mono: true, icon: RouteIcon },
       ],
     },
   ];
@@ -221,7 +170,7 @@ function Index() {
               Invalid IP address or lookup temporarily unavailable.
             </div>
           )}
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr]">
+          <div className="grid grid-cols-1">
             {/* Info sections */}
             <div className="divide-y divide-border">
               <div className="flex items-center justify-between gap-3 px-4 py-3">
@@ -255,15 +204,9 @@ function Index() {
                         dir={r.mono ? "ltr" : undefined}
                         className={`${r.highlight ? "font-semibold text-destructive" : "text-foreground"} ${r.mono ? "font-mono" : ""} ${!r.value ? "text-muted-foreground/60" : ""} break-all`}
                       >
-                        {(r.label === "Country") && (
-                          (sec.title === "Location" && active.country_code) ||
-                          (sec.title !== "Location" && r.value)
-                        ) ? (
+                        {(r.label === "Country" && active.country_code) ? (
                           <span className="inline-flex items-center gap-2">
-                            <Flag
-                              code={sec.title === "Location" ? active.country_code : r.value}
-                              className="h-3.5 w-5 rounded-sm"
-                            />
+                            <Flag code={active.country_code} className="h-3.5 w-5 rounded-sm" />
                             {r.value ?? "—"}
                           </span>
                         ) : (
@@ -277,17 +220,17 @@ function Index() {
             </div>
 
             {/* Map */}
-            <div className="min-h-[320px] border-t border-border md:border-l md:border-t-0">
+            <div className="border-t border-border h-64">
               {mapUrl ? (
                 <iframe
                   key={mapUrl}
                   title="Map"
                   src={mapUrl}
-                  className="h-full min-h-[320px] w-full"
+                  className="h-full w-full"
                   loading="lazy"
                 />
               ) : (
-                <div className="flex h-full min-h-[320px] items-center justify-center p-6 text-center text-sm text-muted-foreground">
+                <div className="flex h-full items-center justify-center p-6 text-center text-sm text-muted-foreground">
                   {active.ip
                     ? "Geolocation coordinates are not available for this IP."
                     : "Enter an IP address to see it on the map."}
