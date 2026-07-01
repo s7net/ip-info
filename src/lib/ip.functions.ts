@@ -125,8 +125,144 @@ async function lookupIpiz(ip: string): Promise<Partial<IPInfo> | null> {
   }
 }
 
+async function lookupIpwhois(ip: string): Promise<Partial<IPInfo> | null> {
+  try {
+    const res = await fetch(`https://ipwho.is/${ip}`, { headers: { accept: "application/json" } });
+    if (!res.ok) return null;
+    const d = (await res.json()) as Record<string, any>;
+    if (d.success === false) return null;
+    const conn = d.connection ?? {};
+    return {
+      country: d.country ?? null,
+      country_code: d.country_code ?? null,
+      is_eu: d.is_eu ?? null,
+      city: d.city ?? null,
+      subdivision: d.region ?? null,
+      continent: d.continent ?? null,
+      latitude: d.latitude ?? null,
+      longitude: d.longitude ?? null,
+      postal_code: d.postal ?? null,
+      time_zone: d.timezone?.id ?? null,
+      calling_code: d.calling_code ?? null,
+      currency_code: d.currency?.code ?? null,
+      asn: conn.asn != null ? { asn: `AS${conn.asn}`, name: conn.isp ?? null, domain: conn.domain ?? null, netname: conn.org ?? null } : null,
+      company: conn.org ? { name: conn.org, domain: conn.domain ?? null } : null,
+      source: "ipwho.is",
+    };
+  } catch { return null; }
+}
+
+async function lookupIpapiCo(ip: string): Promise<Partial<IPInfo> | null> {
+  try {
+    const res = await fetch(`https://ipapi.co/${ip}/json/`, { headers: { accept: "application/json" } });
+    if (!res.ok) return null;
+    const d = (await res.json()) as Record<string, any>;
+    if (d.error) return null;
+    return {
+      country: d.country_name ?? null,
+      country_code: d.country_code ?? null,
+      is_eu: d.in_eu ?? null,
+      city: d.city ?? null,
+      subdivision: d.region ?? null,
+      continent: d.continent_code ?? null,
+      latitude: d.latitude ?? null,
+      longitude: d.longitude ?? null,
+      postal_code: d.postal ?? null,
+      time_zone: d.timezone ?? null,
+      calling_code: d.country_calling_code ? String(d.country_calling_code).replace(/^\+/, "") : null,
+      currency_code: d.currency ?? null,
+      asn: d.asn ? { asn: d.asn, name: d.org ?? null } : null,
+      company: d.org ? { name: d.org } : null,
+      source: "ipapi.co",
+    };
+  } catch { return null; }
+}
+
+async function lookupIpApi(ip: string): Promise<Partial<IPInfo> | null> {
+  try {
+    const res = await fetch(
+      `https://ip-api.com/json/${ip}?fields=status,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,mobile,proxy,hosting,continent`,
+      { headers: { accept: "application/json" } },
+    );
+    if (!res.ok) return null;
+    const d = (await res.json()) as Record<string, any>;
+    if (d.status !== "success") return null;
+    const asMatch = typeof d.as === "string" ? d.as.match(/^AS(\d+)\s*(.*)$/i) : null;
+    return {
+      country: d.country ?? null,
+      country_code: d.countryCode ?? null,
+      city: d.city ?? null,
+      subdivision: d.regionName ?? null,
+      continent: d.continent ?? null,
+      latitude: d.lat ?? null,
+      longitude: d.lon ?? null,
+      postal_code: d.zip ?? null,
+      time_zone: d.timezone ?? null,
+      asn: asMatch ? { asn: `AS${asMatch[1]}`, name: asMatch[2] || d.asname || null } : (d.asname ? { name: d.asname } : null),
+      company: d.org || d.isp ? { name: d.org || d.isp } : null,
+      privacy: (d.proxy != null || d.hosting != null) ? { is_proxy: d.proxy ?? null, is_hosting: d.hosting ?? null } : null,
+      source: "ip-api.com",
+    };
+  } catch { return null; }
+}
+
+async function lookupFreeIpApi(ip: string): Promise<Partial<IPInfo> | null> {
+  try {
+    const res = await fetch(`https://free.freeipapi.com/api/json/${ip}`, { headers: { accept: "application/json" } });
+    if (!res.ok) return null;
+    const d = (await res.json()) as Record<string, any>;
+    if (!d || d.ipVersion == null) return null;
+    return {
+      country: d.countryName ?? null,
+      country_code: d.countryCode ?? null,
+      city: d.cityName ?? null,
+      subdivision: d.regionName ?? null,
+      continent: d.continent ?? null,
+      latitude: d.latitude ?? null,
+      longitude: d.longitude ?? null,
+      postal_code: d.zipCode ?? null,
+      time_zone: d.timeZone ?? null,
+      is_anycast: null,
+      source: "freeipapi.com",
+    };
+  } catch { return null; }
+}
+
+async function lookupReallyFreeGeoIP(ip: string): Promise<Partial<IPInfo> | null> {
+  try {
+    const res = await fetch(`https://reallyfreegeoip.org/json/${ip}`, { headers: { accept: "application/json" } });
+    if (!res.ok) return null;
+    const d = (await res.json()) as Record<string, any>;
+    return {
+      country: d.country_name ?? null,
+      country_code: d.country_code ?? null,
+      city: d.city ?? null,
+      subdivision: d.region_name ?? null,
+      latitude: d.latitude ?? null,
+      longitude: d.longitude ?? null,
+      postal_code: d.zip_code ?? null,
+      time_zone: d.time_zone ?? null,
+      source: "reallyfreegeoip.org",
+    };
+  } catch { return null; }
+}
+
+const PROVIDERS: Array<(ip: string) => Promise<Partial<IPInfo> | null>> = [
+  lookupIplocate,
+  lookupIpwhois,
+  lookupIpApi,
+  lookupIpapiCo,
+  lookupFreeIpApi,
+  lookupReallyFreeGeoIP,
+  lookupIpiz,
+];
+
 async function lookup(ip: string): Promise<Partial<IPInfo>> {
-  return (await lookupIplocate(ip)) ?? (await lookupIpiz(ip)) ?? {};
+  for (const p of PROVIDERS) {
+    const res = await p(ip);
+    if (res) return res;
+  }
+  return {};
 }
 
 export const getUserIP = createServerFn({ method: "GET" }).handler(async (): Promise<IPInfo> => {
