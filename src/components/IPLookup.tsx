@@ -11,12 +11,12 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { getUserIP, lookupIP, type IPInfo } from "@/lib/ip.functions";
+import { getUserIP, lookupIP, PROVIDERS, type IPInfo, type ProviderId } from "@/lib/ip.functions";
 import { Globe as GlobeBG } from "@/components/Globe";
 import { hasFlag } from "country-flag-icons";
 import * as Flags from "country-flag-icons/react/3x2";
 
-const ipQuery = () => ({ queryKey: ["user-ip"] as const, queryFn: getUserIP });
+const ipQuery = () => ({ queryKey: ["user-ip"] as const, queryFn: () => getUserIP({ data: { provider: "auto" } }) });
 
 function Flag({ code, className }: { code?: string | null; className?: string }) {
   const cc = code?.toUpperCase();
@@ -29,14 +29,15 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
   const navigate = useNavigate();
   const fetchIP = useServerFn(getUserIP);
   const lookup = useServerFn(lookupIP);
-  const { data: me } = useSuspenseQuery({ ...ipQuery(), queryFn: fetchIP });
+  const { data: me } = useSuspenseQuery({ ...ipQuery(), queryFn: () => fetchIP({ data: { provider: "auto" } }) });
 
   const [input, setInput] = useState(targetIP ?? "");
   const [copied, setCopied] = useState(false);
+  const [provider, setProvider] = useState<ProviderId>("auto");
 
   const lookupQ = useQuery({
-    queryKey: ["lookup-ip", targetIP],
-    queryFn: () => lookup({ data: { ip: targetIP! } }),
+    queryKey: ["lookup-ip", targetIP, provider],
+    queryFn: () => lookup({ data: { ip: targetIP!, provider } }),
     enabled: !!targetIP,
     placeholderData: (prev) => prev,
   });
@@ -221,6 +222,18 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
               )}
             </div>
             <Button type="submit" className="h-11 px-6">Lookup</Button>
+            <select
+              value={provider}
+              onChange={(e) => setProvider(e.target.value as ProviderId)}
+              dir="ltr"
+              className="h-11 rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+              aria-label="Provider"
+              title="Data source"
+            >
+              {PROVIDERS.map((p) => (
+                <option key={p.id} value={p.id}>{p.label}</option>
+              ))}
+            </select>
           </form>
         </div>
 
