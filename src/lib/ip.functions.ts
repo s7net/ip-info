@@ -254,10 +254,6 @@ function extractIPv4(ip: string): string | null {
   return null;
 }
 
-function isIPv4(ip: string): boolean {
-  return !!extractIPv4(ip);
-}
-
 function pickPreferredIP(forwardedHeader: string | undefined, fallback: string | undefined): string | null {
   if (!forwardedHeader) return fallback ?? null;
   const ips = forwardedHeader.split(",").map((s) => s.trim()).filter(Boolean);
