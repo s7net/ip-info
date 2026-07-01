@@ -38,7 +38,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    reportError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
   return (
@@ -79,12 +79,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "IP Detector | What is my IP" },
       { name: "description", content: "Detect your public IP address instantly and for free." },
-      { name: "author", content: "Lovable" },
       { property: "og:title", content: "IP Detector | What is my IP" },
       { property: "og:description", content: "Detect your public IP address instantly and for free." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "IP Detector | What is my IP" },
       { name: "twitter:description", content: "Detect your public IP address instantly and for free." },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/b2bbe39f-1137-49c0-8b66-5e1fa463c256" },
