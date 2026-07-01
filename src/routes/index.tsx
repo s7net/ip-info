@@ -1,16 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
+import { useState, type FormEvent } from "react";
+import { Search, X, Copy, Check } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { getUserIP } from "@/lib/ip.functions";
+import { getUserIP, lookupIP, type IPInfo } from "@/lib/ip.functions";
 import { hasFlag } from "country-flag-icons";
 import * as Flags from "country-flag-icons/react/3x2";
 
 const ipQuery = () => ({
-  queryKey: ["user-ip"],
+  queryKey: ["user-ip"] as const,
   queryFn: getUserIP,
 });
 
@@ -21,85 +21,202 @@ export const Route = createFileRoute("/")({
   },
 });
 
+function Flag({ code, className }: { code?: string | null; className?: string }) {
+  const cc = code?.toUpperCase();
+  if (!cc || !hasFlag(cc)) return null;
+  const F = (Flags as Record<string, React.ComponentType<{ title?: string; className?: string }>>)[cc];
+  return F ? <F title={cc} className={className} /> : null;
+}
+
 function Index() {
   const fetchIP = useServerFn(getUserIP);
-  const { data, refetch, isFetching } = useSuspenseQuery({
-    ...ipQuery(),
-    queryFn: fetchIP,
-  });
+  const lookup = useServerFn(lookupIP);
+  const { data: me } = useSuspenseQuery({ ...ipQuery(), queryFn: fetchIP });
+
+  const [input, setInput] = useState("");
+  const [target, setTarget] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const ip = data?.ip ?? "تشخیص داده نشد";
+  const lookupQ = useQuery({
+    queryKey: ["lookup-ip", target],
+    queryFn: () => lookup({ data: { ip: target! } }),
+    enabled: !!target,
+  });
 
-  const code = data?.country_code?.toUpperCase();
-  const FlagComponent =
-    code && hasFlag(code) ? (Flags as Record<string, React.ComponentType<{ title?: string; className?: string }>>)[code] : null;
+  const active: IPInfo = (target ? lookupQ.data : me) ?? { ip: null };
+  const loading = target ? lookupQ.isFetching : false;
 
-  const details: Array<{ label: string; value: string | null | undefined }> = [
-    { label: "کشور", value: data?.country ? `${data.country}${data.country_code ? ` (${data.country_code})` : ""}` : null },
-    { label: "منطقه", value: data?.region || null },
-    { label: "شهر", value: data?.city || null },
-    { label: "کد پستی", value: data?.postal || null },
-    { label: "قاره", value: data?.continent || null },
-    { label: "منطقه زمانی", value: data?.timezone || null },
-    { label: "مختصات", value: data?.latitude != null && data?.longitude != null ? `${data.latitude}, ${data.longitude}` : null },
-    { label: "سازمان (ISP)", value: data?.org_name || null },
-    { label: "ASN", value: data?.asn != null ? `AS${data.asn}` : null },
-    { label: "شبکه Tor", value: data?.is_tor == null ? null : data.is_tor ? "بله" : "خیر" },
-  ].filter((d) => d.value);
-
-  const handleCopy = async () => {
-    if (!data?.ip) return;
-    await navigator.clipboard.writeText(data.ip);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const onSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    const v = input.trim();
+    if (!v) return;
+    setTarget(v);
   };
 
+  const reset = () => {
+    setInput("");
+    setTarget(null);
+  };
+
+  const copyIP = async () => {
+    if (!active.ip) return;
+    await navigator.clipboard.writeText(active.ip);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  const rows: Array<{ label: string; value: string | null | undefined; mono?: boolean }> = [
+    { label: "آدرس IP", value: active.ip, mono: true },
+    { label: "ASN", value: active.asn != null ? `AS${active.asn}` : null, mono: true },
+    { label: "سازمان (ISP)", value: active.org_name },
+    { label: "کشور", value: active.country ? `${active.country}${active.country_code ? ` (${active.country_code})` : ""}` : null },
+    { label: "منطقه", value: active.region },
+    { label: "شهر", value: active.city },
+    { label: "کد پستی", value: active.postal },
+    { label: "قاره", value: active.continent },
+    { label: "منطقه زمانی", value: active.timezone },
+    { label: "مختصات", value: active.latitude != null && active.longitude != null ? `${active.latitude}, ${active.longitude}` : null, mono: true },
+    { label: "شبکه Tor", value: active.is_tor == null ? null : active.is_tor ? "بله" : "خیر" },
+  ];
+
+  const lat = active.latitude;
+  const lon = active.longitude;
+  const mapUrl =
+    lat != null && lon != null
+      ? `https://www.openstreetmap.org/export/embed.html?bbox=${lon - 2},${lat - 1.2},${lon + 2},${lat + 1.2}&layer=mapnik&marker=${lat},${lon}`
+      : null;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-lg">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">آدرس IP شما</CardTitle>
-          <CardDescription>این آدرس IP عمومی شما در اینترنت است</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="rounded-lg border bg-muted/50 py-6 text-center">
-            {FlagComponent && (
-              <div className="mb-3 flex justify-center">
-                <FlagComponent title={data?.country ?? code ?? ""} className="h-10 w-auto rounded shadow-sm" />
-              </div>
-            )}
-            <div
-              className={`font-mono text-3xl font-semibold tracking-widest text-foreground transition-opacity ${isFetching ? "opacity-50" : "opacity-100"}`}
-            >
-              {isFetching ? "..." : ip}
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Top bar */}
+      <div className="border-b border-border/60 bg-card/40 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 text-sm">
+          <span className="text-muted-foreground">IP شما:</span>
+          <span dir="ltr" className="rounded bg-primary/20 px-2 py-0.5 font-mono text-primary">
+            {me?.ip ?? "—"}
+          </span>
+          {me?.country && (
+            <span className="flex items-center gap-2 text-muted-foreground">
+              کشور:
+              <Flag code={me.country_code} className="h-4 w-6 rounded-sm shadow-sm" />
+              <span className="text-foreground">
+                {me.country}
+                {me.region || me.city ? ` (${[me.region, me.city].filter(Boolean).join("، ")})` : ""}
+              </span>
+            </span>
+          )}
+        </div>
+      </div>
+
+      <main className="mx-auto max-w-6xl px-4 py-6">
+        {/* Search panel */}
+        <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
+          <form onSubmit={onSubmit} className="flex flex-wrap items-center gap-3">
+            <div className="relative flex-1 min-w-[260px]">
+              <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                dir="ltr"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="IP یا آدرس مورد نظر (مثلاً 8.8.8.8)"
+                className="h-11 w-full rounded-md border border-input bg-background pr-10 pl-10 font-mono text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+              />
+              {input && (
+                <button
+                  type="button"
+                  onClick={reset}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:bg-muted"
+                  aria-label="پاک کردن"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
-          </div>
-          {details.length > 0 && (
-            <div className="rounded-lg border divide-y">
-              {details.map((d) => (
-                <div key={d.label} className="flex items-center justify-between px-4 py-2 text-sm">
-                  <span className="text-muted-foreground">{d.label}</span>
-                  <span className="font-medium text-foreground text-left" dir="ltr">{d.value}</span>
+            <div className="flex flex-wrap gap-2">
+              <Button type="submit" className="h-11 px-6">Info</Button>
+              {(["Ping", "HTTP", "TCP port", "UDP port", "DNS"] as const).map((t) => (
+                <Button key={t} type="button" variant="secondary" className="h-11 opacity-60" disabled>
+                  {t}
+                </Button>
+              ))}
+            </div>
+          </form>
+        </div>
+
+        {/* Header of result */}
+        <div className="mt-6 rounded-t-lg border border-b-0 border-border bg-muted/40 px-4 py-3 text-center text-sm text-muted-foreground">
+          موقعیت آدرس IP: <span dir="ltr" className="font-mono text-foreground">{active.ip ?? "—"}</span>
+        </div>
+
+        <div className="rounded-b-lg border border-border bg-card">
+          {lookupQ.isError && (
+            <div className="border-b border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              IP نامعتبر است یا در حال حاضر امکان دریافت اطلاعات وجود ندارد.
+            </div>
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr]">
+            {/* Info table */}
+            <div className="divide-y divide-border">
+              <div className="flex items-center justify-between gap-3 px-4 py-3">
+                <span className="text-sm font-semibold text-primary">اطلاعات IP</span>
+                <div className="flex items-center gap-2">
+                  {loading && <span className="text-xs text-muted-foreground">در حال بارگذاری…</span>}
+                  {active.ip && (
+                    <button
+                      onClick={copyIP}
+                      className="inline-flex items-center gap-1 rounded border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted"
+                      aria-label="کپی IP"
+                    >
+                      {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                      {copied ? "کپی شد" : "کپی"}
+                    </button>
+                  )}
+                </div>
+              </div>
+              {rows.map((r) => (
+                <div key={r.label} className="grid grid-cols-[110px_1fr] items-center gap-3 px-4 py-2 text-sm even:bg-muted/20">
+                  <span className="text-muted-foreground">{r.label}</span>
+                  <span
+                    dir={r.mono ? "ltr" : undefined}
+                    className={`text-foreground ${r.mono ? "font-mono" : ""} ${!r.value ? "text-muted-foreground/60" : ""}`}
+                  >
+                    {r.label === "کشور" && active.country_code ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Flag code={active.country_code} className="h-3.5 w-5 rounded-sm" />
+                        {r.value ?? "—"}
+                      </span>
+                    ) : (
+                      r.value ?? "—"
+                    )}
+                  </span>
                 </div>
               ))}
             </div>
-          )}
-          <div className="flex gap-3">
-            <Button onClick={handleCopy} disabled={!data?.ip || isFetching} className="flex-1">
-              {copied ? "کپی شد" : "کپی IP"}
-            </Button>
-            <Button
-              onClick={() => refetch()}
-              variant="outline"
-              disabled={isFetching}
-              className="flex-1"
-            >
-              به‌روزرسانی
-            </Button>
+
+            {/* Map */}
+            <div className="min-h-[320px] border-t border-border md:border-r md:border-t-0">
+              {mapUrl ? (
+                <iframe
+                  key={mapUrl}
+                  title="Map"
+                  src={mapUrl}
+                  className="h-full min-h-[320px] w-full"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="flex h-full min-h-[320px] items-center justify-center p-6 text-center text-sm text-muted-foreground">
+                  {active.ip
+                    ? "مختصات جغرافیایی برای این IP در دسترس نیست."
+                    : "برای مشاهده روی نقشه، یک IP وارد کنید."}
+                </div>
+              )}
+            </div>
           </div>
-        </CardContent>
-      </Card>
+          <div className="border-t border-border px-4 py-2 text-center text-xs text-muted-foreground">
+            داده‌ها از <a href="https://api.ipiz.net" target="_blank" rel="noreferrer" className="text-primary hover:underline">ipiz.net</a> و نقشه از OpenStreetMap
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
