@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequestIP } from "@tanstack/react-start/server";
+import { getRequestHeader, getRequestIP } from "@tanstack/react-start/server";
 
 export type ASNInfo = {
   asn?: string | null;
@@ -247,6 +247,20 @@ async function lookupReallyFreeGeoIP(ip: string): Promise<Partial<IPInfo> | null
   } catch { return null; }
 }
 
+function extractIPv4(ip: string): string | null {
+  const mapped = ip.match(/^::(?:(?:ffff|FFFF):)?(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/);
+  if (mapped) return mapped[1];
+  if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip)) return ip;
+  return null;
+}
+
+function pickPreferredIP(forwardedHeader: string | undefined, fallback: string | undefined): string | null {
+  const first = forwardedHeader?.split(",")[0]?.trim();
+  const ip = first ?? fallback;
+  if (!ip) return null;
+  return extractIPv4(ip) ?? ip;
+}
+
 export type ProviderId =
   | "auto"
   | "iplocate"
@@ -300,7 +314,9 @@ export const getUserIP = createServerFn({ method: "GET" })
     return { provider: (p && (p === "auto" || p in PROVIDER_MAP) ? p : "auto") as ProviderId };
   })
   .handler(async ({ data }): Promise<IPInfo> => {
-    const ip = getRequestIP({ xForwardedFor: true }) ?? null;
+    const fallback = getRequestIP({ xForwardedFor: true }) ?? undefined;
+    const forwarded = getRequestHeader("x-forwarded-for");
+    const ip = pickPreferredIP(forwarded, fallback);
     if (!ip || ip === "::1" || ip === "127.0.0.1") {
       return { ip };
     }
