@@ -66,17 +66,17 @@ function Index() {
   };
 
   const rows: Array<{ label: string; value: string | null | undefined; mono?: boolean }> = [
-    { label: "آدرس IP", value: active.ip, mono: true },
+    { label: "IP Address", value: active.ip, mono: true },
     { label: "ASN", value: active.asn != null ? `AS${active.asn}` : null, mono: true },
-    { label: "سازمان (ISP)", value: active.org_name },
-    { label: "کشور", value: active.country ? `${active.country}${active.country_code ? ` (${active.country_code})` : ""}` : null },
-    { label: "منطقه", value: active.region },
-    { label: "شهر", value: active.city },
-    { label: "کد پستی", value: active.postal },
-    { label: "قاره", value: active.continent },
-    { label: "منطقه زمانی", value: active.timezone },
-    { label: "مختصات", value: active.latitude != null && active.longitude != null ? `${active.latitude}, ${active.longitude}` : null, mono: true },
-    { label: "شبکه Tor", value: active.is_tor == null ? null : active.is_tor ? "بله" : "خیر" },
+    { label: "Organization (ISP)", value: active.org_name },
+    { label: "Country", value: active.country ? `${active.country}${active.country_code ? ` (${active.country_code})` : ""}` : null },
+    { label: "Region", value: active.region },
+    { label: "City", value: active.city },
+    { label: "Postal Code", value: active.postal },
+    { label: "Continent", value: active.continent },
+    { label: "Timezone", value: active.timezone },
+    { label: "Coordinates", value: active.latitude != null && active.longitude != null ? `${active.latitude}, ${active.longitude}` : null, mono: true },
+    { label: "Tor Network", value: active.is_tor == null ? null : active.is_tor ? "Yes" : "No" },
   ];
 
   const lat = active.latitude;
