@@ -6,6 +6,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getUserIP } from "@/lib/ip.functions";
+import { hasFlag } from "country-flag-icons";
+import * as Flags from "country-flag-icons/react/3x2";
 
 const ipQuery = () => ({
   queryKey: ["user-ip"],
@@ -28,6 +30,10 @@ function Index() {
   const [copied, setCopied] = useState(false);
 
   const ip = data?.ip ?? "تشخیص داده نشد";
+
+  const code = data?.country_code?.toUpperCase();
+  const FlagComponent =
+    code && hasFlag(code) ? (Flags as Record<string, React.ComponentType<{ title?: string; className?: string }>>)[code] : null;
 
   const details: Array<{ label: string; value: string | null | undefined }> = [
     { label: "کشور", value: data?.country ? `${data.country}${data.country_code ? ` (${data.country_code})` : ""}` : null },
@@ -58,6 +64,11 @@ function Index() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="rounded-lg border bg-muted/50 py-6 text-center">
+            {FlagComponent && (
+              <div className="mb-3 flex justify-center">
+                <FlagComponent title={data?.country ?? code ?? ""} className="h-10 w-auto rounded shadow-sm" />
+              </div>
+            )}
             <div
               className={`font-mono text-3xl font-semibold tracking-widest text-foreground transition-opacity ${isFetching ? "opacity-50" : "opacity-100"}`}
             >
