@@ -85,6 +85,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "IP Detector | What is my IP" },
+      { name: "twitter:description", content: "Detect your public IP address instantly and for free." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/b2bbe39f-1137-49c0-8b66-5e1fa463c256" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/b2bbe39f-1137-49c0-8b66-5e1fa463c256" },
     ],
     links: [
       {
