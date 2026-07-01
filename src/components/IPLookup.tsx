@@ -305,9 +305,9 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
                         dir={r.mono ? "ltr" : undefined}
                         className={`${r.highlight ? "font-semibold text-foreground" : "text-foreground"} ${r.mono ? "font-mono" : ""} ${!r.value ? "text-muted-foreground/60" : ""} break-all`}
                       >
-                        {(r.label === "Country" && r.value) ? (
+                        {(r.label === "Country" && (sec.title === "Location" ? active.country_code : r.value)) ? (
                           <span className="inline-flex items-center gap-2">
-                            <Flag code={r.value} className="h-3.5 w-5 rounded-sm" />
+                            <Flag code={sec.title === "Location" ? active.country_code : r.value} className="h-3.5 w-5 rounded-sm" />
                             {r.value ?? "—"}
                           </span>
                         ) : (
