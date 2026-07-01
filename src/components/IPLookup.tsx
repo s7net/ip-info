@@ -215,7 +215,14 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
         </div>
 
         <div className="mt-6 rounded-t-lg border border-b-0 border-border bg-muted/60 px-4 py-3 text-center text-sm text-muted-foreground backdrop-blur">
-          IP location for: <span dir="ltr" className="font-mono text-foreground">{active.ip ?? "—"}</span>
+          IP location for:{" "}
+          {active.host && (
+            <>
+              <span dir="ltr" className="font-mono text-foreground">{active.host}</span>
+              {" "}<span className="text-muted-foreground/70">→</span>{" "}
+            </>
+          )}
+          <span dir="ltr" className="font-mono text-foreground">{active.ip ?? "—"}</span>
         </div>
 
         <div className="relative rounded-b-lg border border-border bg-card/85 backdrop-blur">
