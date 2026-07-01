@@ -175,7 +175,7 @@ function Index() {
               <Flag code={me.country_code} className="h-4 w-6 rounded-sm shadow-sm" />
               <span className="text-foreground">
                 {me.country}
-                {me.region || me.city ? ` (${[me.region, me.city].filter(Boolean).join(", ")})` : ""}
+                {me.subdivision || me.city ? ` (${[me.subdivision, me.city].filter(Boolean).join(", ")})` : ""}
               </span>
             </span>
           )}
