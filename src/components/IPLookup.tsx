@@ -160,7 +160,7 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
   const lon = active.longitude;
   const mapUrl =
     lat != null && lon != null
-      ? `https://www.openstreetmap.org/export/embed.html?bbox=${lon - 2},${lat - 1.2},${lon + 2},${lat + 1.2}&layer=mapnik&marker=${lat},${lon}`
+      ? `https://maps.google.com/maps?q=${lat},${lon}&z=6&hl=en&output=embed`
       : null;
 
   const contentKey = active.ip ?? "empty";
