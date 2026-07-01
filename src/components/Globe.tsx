@@ -9,6 +9,7 @@ export function Globe() {
     let phi = 0;
     let width = 0;
     let raf = 0;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const onResize = () => {
       if (canvasRef.current) width = canvasRef.current.offsetWidth;
     };
@@ -16,9 +17,9 @@ export function Globe() {
     onResize();
 
     const globe = createGlobe(canvasRef.current, {
-      devicePixelRatio: 2,
-      width: width * 2,
-      height: width * 2,
+      devicePixelRatio: dpr,
+      width: width * dpr,
+      height: width * dpr,
       phi: 0,
       theta: 0.25,
       dark: 1,
@@ -33,7 +34,7 @@ export function Globe() {
 
     const tick = () => {
       phi += 0.003;
-      globe.update({ phi, width: width * 2, height: width * 2 });
+      globe.update({ phi, width: width * dpr, height: width * dpr });
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
