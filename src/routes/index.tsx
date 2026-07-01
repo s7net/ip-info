@@ -187,7 +187,7 @@ function Index() {
             </div>
 
             {/* Map */}
-            <div className="min-h-[320px] border-t border-border md:border-r md:border-t-0">
+            <div className="min-h-[320px] border-t border-border md:border-l md:border-t-0">
               {mapUrl ? (
                 <iframe
                   key={mapUrl}
@@ -199,14 +199,14 @@ function Index() {
               ) : (
                 <div className="flex h-full min-h-[320px] items-center justify-center p-6 text-center text-sm text-muted-foreground">
                   {active.ip
-                    ? "مختصات جغرافیایی برای این IP در دسترس نیست."
-                    : "برای مشاهده روی نقشه، یک IP وارد کنید."}
+                    ? "Geolocation coordinates are not available for this IP."
+                    : "Enter an IP address to see it on the map."}
                 </div>
               )}
             </div>
           </div>
           <div className="border-t border-border px-4 py-2 text-center text-xs text-muted-foreground">
-            داده‌ها از <a href="https://api.ipiz.net" target="_blank" rel="noreferrer" className="text-primary hover:underline">ipiz.net</a> و نقشه از OpenStreetMap
+            Data from <a href="https://api.ipiz.net" target="_blank" rel="noreferrer" className="text-primary hover:underline">ipiz.net</a> · Map by OpenStreetMap
           </div>
         </div>
       </main>
