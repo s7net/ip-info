@@ -72,6 +72,10 @@ function Index() {
   };
 
   const yn = (v: boolean | null | undefined) => v == null ? null : v ? "Yes" : "No";
+  const p = active.privacy ?? {};
+  const a = active.asn ?? {};
+  const c = active.company ?? {};
+  const ab = active.abuse ?? {};
 
   type Row = {
     label: string;
