@@ -4,9 +4,10 @@ import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import {
   Search, X, Copy, Check,
-  Globe, Flag as FlagIcon, Map, MapPin,
-  Mailbox, Earth, Clock, Compass,
-  DollarSign, Phone, Satellite, Radio, Landmark,
+  Globe, Network, Building2, Flag as FlagIcon, Map, MapPin,
+  Mailbox, Earth, Clock, Compass, ShieldAlert,
+  DollarSign, Phone, Satellite, Radio, Route as RouteIcon,
+  Server, Tag, Landmark, Mail, User, Home, Fingerprint,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -71,6 +72,10 @@ function Index() {
   };
 
   const yn = (v: boolean | null | undefined) => v == null ? null : v ? "Yes" : "No";
+  const p = active.privacy ?? {};
+  const a = active.asn ?? {};
+  const c = active.company ?? {};
+  const ab = active.abuse ?? {};
 
   type Row = {
     label: string;
@@ -98,6 +103,52 @@ function Index() {
         { label: "Calling Code", value: active.calling_code ? `+${active.calling_code}` : null, icon: Phone },
         { label: "Anycast", value: yn(active.is_anycast), icon: Radio },
         { label: "Satellite", value: yn(active.is_satellite), icon: Satellite },
+      ],
+    },
+    {
+      title: "ASN / Network",
+      rows: [
+        { label: "ASN", value: a.asn, mono: true, icon: Network },
+        { label: "Route", value: a.route, mono: true, icon: RouteIcon },
+        { label: "Netname", value: a.netname, icon: Tag },
+        { label: "Name", value: a.name, icon: Building2 },
+        { label: "Country", value: a.country_code, icon: FlagIcon },
+        { label: "Domain", value: a.domain, icon: Globe },
+        { label: "Type", value: a.type, icon: Server },
+        { label: "RIR", value: a.rir, icon: Landmark },
+      ],
+    },
+    {
+      title: "Company",
+      rows: [
+        { label: "Name", value: c.name, icon: Building2 },
+        { label: "Domain", value: c.domain, icon: Globe },
+        { label: "Country", value: c.country_code, icon: FlagIcon },
+        { label: "Type", value: c.type, icon: Server },
+      ],
+    },
+    {
+      title: "Privacy",
+      rows: [
+        { label: "Abuser", value: yn(p.is_abuser), icon: ShieldAlert, highlight: !!p.is_abuser },
+        { label: "Anonymous", value: yn(p.is_anonymous), icon: Fingerprint, highlight: !!p.is_anonymous },
+        { label: "Bogon", value: yn(p.is_bogon), icon: ShieldAlert, highlight: !!p.is_bogon },
+        { label: "Hosting", value: yn(p.is_hosting), icon: Server, highlight: !!p.is_hosting },
+        { label: "iCloud Relay", value: yn(p.is_icloud_relay), icon: Radio, highlight: !!p.is_icloud_relay },
+        { label: "Proxy", value: yn(p.is_proxy), icon: ShieldAlert, highlight: !!p.is_proxy },
+        { label: "Tor", value: yn(p.is_tor), icon: ShieldAlert, highlight: !!p.is_tor },
+        { label: "VPN", value: yn(p.is_vpn), icon: ShieldAlert, highlight: !!p.is_vpn },
+      ],
+    },
+    {
+      title: "Abuse Contact",
+      rows: [
+        { label: "Name", value: ab.name, icon: User },
+        { label: "Email", value: ab.email, icon: Mail, mono: true },
+        { label: "Phone", value: ab.phone, icon: Phone, mono: true },
+        { label: "Address", value: ab.address, icon: Home },
+        { label: "Country", value: ab.country_code, icon: FlagIcon },
+        { label: "Network", value: ab.network, mono: true, icon: RouteIcon },
       ],
     },
   ];
@@ -170,32 +221,34 @@ function Index() {
               Invalid IP address or lookup temporarily unavailable.
             </div>
           )}
-          <div className="grid grid-cols-1">
-            {/* Info sections */}
-            <div className="divide-y divide-border">
-              <div className="flex items-center justify-between gap-3 px-4 py-3">
-                <span className="text-sm font-semibold text-primary">IP Information</span>
-                <div className="flex items-center gap-2">
-                  {loading && <span className="text-xs text-muted-foreground">Loading…</span>}
-                  {active.ip && (
-                    <button
-                      onClick={copyIP}
-                      className="inline-flex items-center gap-1 rounded border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted"
-                      aria-label="Copy IP"
-                    >
-                      {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                      {copied ? "Copied" : "Copy"}
-                    </button>
-                  )}
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            {/* Header */}
+            <div className="col-span-1 md:col-span-2 flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+              <span className="text-sm font-semibold text-primary">IP Information</span>
+              <div className="flex items-center gap-2">
+                {loading && <span className="text-xs text-muted-foreground">Loading…</span>}
+                {active.ip && (
+                  <button
+                    onClick={copyIP}
+                    className="inline-flex items-center gap-1 rounded border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted"
+                    aria-label="Copy IP"
+                  >
+                    {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                    {copied ? "Copied" : "Copy"}
+                  </button>
+                )}
               </div>
-              {sections.map((sec) => (
+            </div>
+
+            {/* Left: Location */}
+            <div className="divide-y divide-border md:border-r md:border-border">
+              {sections.filter(s => s.title === "Location").map((sec) => (
                 <div key={sec.title}>
                   <div className="bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
                     {sec.title}
                   </div>
                   {sec.rows.map((r) => (
-                    <div key={sec.title + r.label} className="grid grid-cols-[160px_1fr] items-center gap-3 border-t border-border/60 px-4 py-2 text-sm even:bg-muted/20">
+                    <div key={sec.title + r.label} className="grid grid-cols-[140px_1fr] items-center gap-3 border-t border-border/60 px-4 py-2 text-sm even:bg-muted/20">
                       <span className="flex items-center gap-2 text-muted-foreground">
                         <r.icon className="h-4 w-4 text-primary" />
                         {r.label}
@@ -219,8 +272,40 @@ function Index() {
               ))}
             </div>
 
+            {/* Right: ASN / Company / Privacy / Abuse */}
+            <div className="divide-y divide-border">
+              {sections.filter(s => s.title !== "Location").map((sec) => (
+                <div key={sec.title}>
+                  <div className="bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+                    {sec.title}
+                  </div>
+                  {sec.rows.map((r) => (
+                    <div key={sec.title + r.label} className="grid grid-cols-[140px_1fr] items-center gap-3 border-t border-border/60 px-4 py-2 text-sm even:bg-muted/20">
+                      <span className="flex items-center gap-2 text-muted-foreground">
+                        <r.icon className="h-4 w-4 text-primary" />
+                        {r.label}
+                      </span>
+                      <span
+                        dir={r.mono ? "ltr" : undefined}
+                        className={`${r.highlight ? "font-semibold text-destructive" : "text-foreground"} ${r.mono ? "font-mono" : ""} ${!r.value ? "text-muted-foreground/60" : ""} break-all`}
+                      >
+                        {(r.label === "Country" && r.value) ? (
+                          <span className="inline-flex items-center gap-2">
+                            <Flag code={r.value} className="h-3.5 w-5 rounded-sm" />
+                            {r.value ?? "—"}
+                          </span>
+                        ) : (
+                          r.value ?? "—"
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+
             {/* Map */}
-            <div className="border-t border-border h-64">
+            <div className="col-span-1 md:col-span-2 border-t border-border h-64">
               {mapUrl ? (
                 <iframe
                   key={mapUrl}
