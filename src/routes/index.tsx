@@ -91,17 +91,17 @@ function Index() {
       {/* Top bar */}
       <div className="border-b border-border/60 bg-card/40 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 text-sm">
-          <span className="text-muted-foreground">IP شما:</span>
+          <span className="text-muted-foreground">Your IP:</span>
           <span dir="ltr" className="rounded bg-primary/20 px-2 py-0.5 font-mono text-primary">
             {me?.ip ?? "—"}
           </span>
           {me?.country && (
             <span className="flex items-center gap-2 text-muted-foreground">
-              کشور:
+              Country:
               <Flag code={me.country_code} className="h-4 w-6 rounded-sm shadow-sm" />
               <span className="text-foreground">
                 {me.country}
-                {me.region || me.city ? ` (${[me.region, me.city].filter(Boolean).join("، ")})` : ""}
+                {me.region || me.city ? ` (${[me.region, me.city].filter(Boolean).join(", ")})` : ""}
               </span>
             </span>
           )}
