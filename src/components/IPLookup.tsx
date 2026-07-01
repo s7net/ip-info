@@ -200,29 +200,29 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
       <div className="relative border-b border-border/60 bg-card/60 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 gap-y-1 px-3 py-1.5 sm:gap-x-4 sm:gap-y-2 sm:px-4 sm:py-2 sm:text-sm">
           <span className="text-xs text-muted-foreground sm:text-sm">Your IP:</span>
-          {me?.ip ? (
+          {effectiveMe?.ip ? (
             <button
               type="button"
-              onClick={() => navigate({ to: "/$ip", params: { ip: me.ip! } })}
+              onClick={() => navigate({ to: "/$ip", params: { ip: effectiveMe.ip! } })}
               dir="ltr"
               className="rounded bg-primary/20 px-1.5 py-0.5 font-mono text-xs text-primary underline-offset-2 hover:bg-primary/30 hover:underline transition sm:px-2 sm:text-sm"
               aria-label="Lookup your IP"
             >
-              {me.ip}
+              {effectiveMe.ip}
             </button>
           ) : (
             <span dir="ltr" className="rounded bg-primary/20 px-1.5 py-0.5 font-mono text-xs text-primary sm:px-2 sm:text-sm">—</span>
           )}
-          {me?.country && (
+          {effectiveMe?.country && (
             <span className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground sm:ml-0 sm:gap-2 sm:text-sm">
               <span className="hidden sm:inline">Country:</span>
-              <Flag code={me.country_code} className="h-3 w-4 rounded-sm shadow-sm sm:h-4 sm:w-6" />
+              <Flag code={effectiveMe.country_code} className="h-3 w-4 rounded-sm shadow-sm sm:h-4 sm:w-6" />
               <span className="truncate max-w-[120px] text-foreground sm:hidden sm:max-w-none">
-                {me.country}
+                {effectiveMe.country}
               </span>
               <span className="hidden truncate text-foreground sm:inline">
-                {me.country}
-                {me.subdivision || me.city ? ` (${[me.subdivision, me.city].filter(Boolean).join(", ")})` : ""}
+                {effectiveMe.country}
+                {effectiveMe.subdivision || effectiveMe.city ? ` (${[effectiveMe.subdivision, effectiveMe.city].filter(Boolean).join(", ")})` : ""}
               </span>
             </span>
           )}
