@@ -33,6 +33,32 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
   const lookup = useServerFn(lookupIP);
   const { data: me } = useSuspenseQuery({ ...ipQuery(), queryFn: () => fetchIP({ data: { provider: "auto" } }) });
 
+  // Client-side IPv4 fallback: when the server can't detect an IPv4 (e.g. user is
+  // reaching Cloudflare over IPv6), fetch the visitor's IPv4 from an IPv4-only
+  // endpoint and re-lookup so we always show IPv4.
+  const ipv4Fallback = useQuery({
+    queryKey: ["client-ipv4-fallback"],
+    enabled: !me?.ip,
+    queryFn: async () => {
+      const endpoints = [
+        "https://api.ipify.org?format=json",
+        "https://ipv4.icanhazip.com",
+      ];
+      for (const url of endpoints) {
+        try {
+          const r = await fetch(url);
+          if (!r.ok) continue;
+          const text = (await r.text()).trim();
+          const v4Match = text.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/);
+          if (v4Match) return lookup({ data: { ip: v4Match[1], provider: "auto" } });
+        } catch { /* try next */ }
+      }
+      return null;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+  const effectiveMe: IPInfo = (me?.ip ? me : ipv4Fallback.data) ?? { ip: null };
+
   const [input, setInput] = useState(targetIP ?? "");
   const [copied, setCopied] = useState(false);
   const [provider, setProvider] = useState<ProviderId>("auto");
@@ -44,7 +70,7 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
     placeholderData: (prev) => prev,
   });
 
-  const active: IPInfo = (targetIP ? lookupQ.data : me) ?? { ip: null };
+  const active: IPInfo = (targetIP ? lookupQ.data : effectiveMe) ?? { ip: null };
   const rawLoading = targetIP ? (lookupQ.isFetching || lookupQ.isPending) : false;
 
   // Enforce a short minimum visible loading duration so the transition feels natural
