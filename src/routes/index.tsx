@@ -138,30 +138,30 @@ function Index() {
 
         {/* Header of result */}
         <div className="mt-6 rounded-t-lg border border-b-0 border-border bg-muted/40 px-4 py-3 text-center text-sm text-muted-foreground">
-          موقعیت آدرس IP: <span dir="ltr" className="font-mono text-foreground">{active.ip ?? "—"}</span>
+          IP location for: <span dir="ltr" className="font-mono text-foreground">{active.ip ?? "—"}</span>
         </div>
 
         <div className="rounded-b-lg border border-border bg-card">
           {lookupQ.isError && (
             <div className="border-b border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              IP نامعتبر است یا در حال حاضر امکان دریافت اطلاعات وجود ندارد.
+              Invalid IP address or lookup temporarily unavailable.
             </div>
           )}
           <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr]">
             {/* Info table */}
             <div className="divide-y divide-border">
               <div className="flex items-center justify-between gap-3 px-4 py-3">
-                <span className="text-sm font-semibold text-primary">اطلاعات IP</span>
+                <span className="text-sm font-semibold text-primary">IP Information</span>
                 <div className="flex items-center gap-2">
-                  {loading && <span className="text-xs text-muted-foreground">در حال بارگذاری…</span>}
+                  {loading && <span className="text-xs text-muted-foreground">Loading…</span>}
                   {active.ip && (
                     <button
                       onClick={copyIP}
                       className="inline-flex items-center gap-1 rounded border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted"
-                      aria-label="کپی IP"
+                      aria-label="Copy IP"
                     >
                       {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                      {copied ? "کپی شد" : "کپی"}
+                      {copied ? "Copied" : "Copy"}
                     </button>
                   )}
                 </div>
@@ -173,7 +173,7 @@ function Index() {
                     dir={r.mono ? "ltr" : undefined}
                     className={`text-foreground ${r.mono ? "font-mono" : ""} ${!r.value ? "text-muted-foreground/60" : ""}`}
                   >
-                    {r.label === "کشور" && active.country_code ? (
+                    {r.label === "Country" && active.country_code ? (
                       <span className="inline-flex items-center gap-2">
                         <Flag code={active.country_code} className="h-3.5 w-5 rounded-sm" />
                         {r.value ?? "—"}
