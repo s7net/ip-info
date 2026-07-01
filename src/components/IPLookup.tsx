@@ -223,7 +223,6 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
                 </button>
               )}
             </div>
-            <Button type="submit" className="h-11 px-6">Lookup</Button>
             <Select value={provider} onValueChange={(v) => setProvider(v as ProviderId)}>
               <SelectTrigger
                 dir="ltr"
@@ -241,6 +240,7 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
                 ))}
               </SelectContent>
             </Select>
+            <Button type="submit" className="h-11 px-6">Lookup</Button>
           </form>
         </div>
 
