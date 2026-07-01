@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
-const BASE_URL = "https://see-my-ip.lovable.app";
+const BASE_URL = "https://ip.glynet.org";
 
 interface SitemapEntry {
   path: string;
