@@ -12,6 +12,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { getUserIP, lookupIP, type IPInfo } from "@/lib/ip.functions";
+import { Globe as GlobeBG } from "@/components/Globe";
 import { hasFlag } from "country-flag-icons";
 import * as Flags from "country-flag-icons/react/3x2";
 
@@ -161,9 +162,10 @@ function Index() {
       : null;
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="relative min-h-screen bg-background text-foreground">
+      <GlobeBG />
       {/* Top bar */}
-      <div className="border-b border-border/60 bg-card/40 backdrop-blur">
+      <div className="relative border-b border-border/60 bg-card/60 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 text-sm">
           <span className="text-muted-foreground">Your IP:</span>
           <span dir="ltr" className="rounded bg-primary/20 px-2 py-0.5 font-mono text-primary">
@@ -182,9 +184,9 @@ function Index() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-6xl px-4 py-6">
+      <main className="relative mx-auto max-w-6xl px-4 py-6">
         {/* Search panel */}
-        <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
+        <div className="rounded-lg border border-border bg-card/80 p-4 shadow-sm backdrop-blur">
           <form onSubmit={onSubmit} className="flex flex-wrap items-center gap-3">
             <div className="relative flex-1 min-w-[260px]">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -211,17 +213,17 @@ function Index() {
         </div>
 
         {/* Header of result */}
-        <div className="mt-6 rounded-t-lg border border-b-0 border-border bg-muted/40 px-4 py-3 text-center text-sm text-muted-foreground">
+        <div className="mt-6 rounded-t-lg border border-b-0 border-border bg-muted/60 px-4 py-3 text-center text-sm text-muted-foreground backdrop-blur">
           IP location for: <span dir="ltr" className="font-mono text-foreground">{active.ip ?? "—"}</span>
         </div>
 
-        <div className="rounded-b-lg border border-border bg-card">
+        <div className="rounded-b-lg border border-border bg-card/85 backdrop-blur">
           {lookupQ.isError && (
             <div className="border-b border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               Invalid IP address or lookup temporarily unavailable.
             </div>
           )}
-          <div className="grid grid-cols-1 md:grid-cols-2">
+          <div className="grid grid-cols-1 items-stretch md:grid-cols-2">
             {/* Header */}
             <div className="col-span-1 md:col-span-2 flex items-center justify-between gap-3 border-b border-border px-4 py-3">
               <span className="text-sm font-semibold text-primary">IP Information</span>
@@ -241,7 +243,7 @@ function Index() {
             </div>
 
             {/* Left: Location + Abuse Contact */}
-            <div className="divide-y divide-border md:border-r md:border-border">
+            <div className="flex flex-col divide-y divide-border md:border-r md:border-border">
               {sections.filter(s => s.title === "Location" || s.title === "Abuse Contact").map((sec) => (
                 <div key={sec.title}>
                   <div className="bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
@@ -270,10 +272,11 @@ function Index() {
                   ))}
                 </div>
               ))}
+              <div className="flex-1 border-t border-border/60 bg-muted/10" />
             </div>
 
             {/* Right: ASN / Company / Privacy */}
-            <div className="divide-y divide-border">
+            <div className="flex flex-col divide-y divide-border">
               {sections.filter(s => s.title !== "Location" && s.title !== "Abuse Contact").map((sec) => (
                 <div key={sec.title}>
                   <div className="bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
@@ -302,6 +305,7 @@ function Index() {
                   ))}
                 </div>
               ))}
+              <div className="flex-1 border-t border-border/60 bg-muted/10" />
             </div>
 
             {/* Map */}
