@@ -317,7 +317,9 @@ export const getUserIP = createServerFn({ method: "GET" })
     return { provider: (p && (p === "auto" || p in PROVIDER_MAP) ? p : "auto") as ProviderId };
   })
   .handler(async ({ data }): Promise<IPInfo> => {
-    const ip = getRequestIP({ xForwardedFor: true }) ?? null;
+    const fallback = getRequestIP({ xForwardedFor: true }) ?? undefined;
+    const forwarded = getRequestHeader("x-forwarded-for");
+    const ip = pickPreferredIP(forwarded, fallback);
     if (!ip || ip === "::1" || ip === "127.0.0.1") {
       return { ip };
     }
