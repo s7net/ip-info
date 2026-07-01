@@ -221,32 +221,34 @@ function Index() {
               Invalid IP address or lookup temporarily unavailable.
             </div>
           )}
-          <div className="grid grid-cols-1">
-            {/* Info sections */}
-            <div className="divide-y divide-border">
-              <div className="flex items-center justify-between gap-3 px-4 py-3">
-                <span className="text-sm font-semibold text-primary">IP Information</span>
-                <div className="flex items-center gap-2">
-                  {loading && <span className="text-xs text-muted-foreground">Loading…</span>}
-                  {active.ip && (
-                    <button
-                      onClick={copyIP}
-                      className="inline-flex items-center gap-1 rounded border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted"
-                      aria-label="Copy IP"
-                    >
-                      {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                      {copied ? "Copied" : "Copy"}
-                    </button>
-                  )}
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            {/* Header */}
+            <div className="col-span-1 md:col-span-2 flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+              <span className="text-sm font-semibold text-primary">IP Information</span>
+              <div className="flex items-center gap-2">
+                {loading && <span className="text-xs text-muted-foreground">Loading…</span>}
+                {active.ip && (
+                  <button
+                    onClick={copyIP}
+                    className="inline-flex items-center gap-1 rounded border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted"
+                    aria-label="Copy IP"
+                  >
+                    {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                    {copied ? "Copied" : "Copy"}
+                  </button>
+                )}
               </div>
-              {sections.map((sec) => (
+            </div>
+
+            {/* Left: Location */}
+            <div className="divide-y divide-border md:border-r md:border-border">
+              {sections.filter(s => s.title === "Location").map((sec) => (
                 <div key={sec.title}>
                   <div className="bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
                     {sec.title}
                   </div>
                   {sec.rows.map((r) => (
-                    <div key={sec.title + r.label} className="grid grid-cols-[160px_1fr] items-center gap-3 border-t border-border/60 px-4 py-2 text-sm even:bg-muted/20">
+                    <div key={sec.title + r.label} className="grid grid-cols-[140px_1fr] items-center gap-3 border-t border-border/60 px-4 py-2 text-sm even:bg-muted/20">
                       <span className="flex items-center gap-2 text-muted-foreground">
                         <r.icon className="h-4 w-4 text-primary" />
                         {r.label}
@@ -270,8 +272,40 @@ function Index() {
               ))}
             </div>
 
+            {/* Right: ASN / Company / Privacy / Abuse */}
+            <div className="divide-y divide-border">
+              {sections.filter(s => s.title !== "Location").map((sec) => (
+                <div key={sec.title}>
+                  <div className="bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+                    {sec.title}
+                  </div>
+                  {sec.rows.map((r) => (
+                    <div key={sec.title + r.label} className="grid grid-cols-[140px_1fr] items-center gap-3 border-t border-border/60 px-4 py-2 text-sm even:bg-muted/20">
+                      <span className="flex items-center gap-2 text-muted-foreground">
+                        <r.icon className="h-4 w-4 text-primary" />
+                        {r.label}
+                      </span>
+                      <span
+                        dir={r.mono ? "ltr" : undefined}
+                        className={`${r.highlight ? "font-semibold text-destructive" : "text-foreground"} ${r.mono ? "font-mono" : ""} ${!r.value ? "text-muted-foreground/60" : ""} break-all`}
+                      >
+                        {(r.label === "Country" && r.value) ? (
+                          <span className="inline-flex items-center gap-2">
+                            <Flag code={r.value} className="h-3.5 w-5 rounded-sm" />
+                            {r.value ?? "—"}
+                          </span>
+                        ) : (
+                          r.value ?? "—"
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+
             {/* Map */}
-            <div className="border-t border-border h-64">
+            <div className="col-span-1 md:col-span-2 border-t border-border h-64">
               {mapUrl ? (
                 <iframe
                   key={mapUrl}
