@@ -47,7 +47,7 @@ export function Globe() {
 
   return (
     <div
-      className="pointer-events-none fixed inset-0 -z-10 flex items-end justify-center overflow-hidden"
+      className="pointer-events-none fixed inset-0 z-0 flex items-end justify-center overflow-hidden"
       aria-hidden
     >
       <div className="relative aspect-square w-[min(180vh,160vw)] translate-y-1/2 opacity-40">
