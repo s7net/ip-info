@@ -44,14 +44,14 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
   const active: IPInfo = (targetIP ? lookupQ.data : me) ?? { ip: null };
   const rawLoading = targetIP ? (lookupQ.isFetching || lookupQ.isPending) : false;
 
-  // Enforce a minimum visible loading duration so the transition feels smooth
+  // Enforce a short minimum visible loading duration so the transition feels natural
   const [loading, setLoading] = useState(rawLoading);
   useEffect(() => {
     if (rawLoading) {
       setLoading(true);
       return;
     }
-    const t = setTimeout(() => setLoading(false), 500);
+    const t = setTimeout(() => setLoading(false), 250);
     return () => clearTimeout(t);
   }, [rawLoading, targetIP]);
 
