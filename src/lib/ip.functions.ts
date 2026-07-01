@@ -247,32 +247,66 @@ async function lookupReallyFreeGeoIP(ip: string): Promise<Partial<IPInfo> | null
   } catch { return null; }
 }
 
-const PROVIDERS: Array<(ip: string) => Promise<Partial<IPInfo> | null>> = [
-  lookupIplocate,
-  lookupIpwhois,
-  lookupIpApi,
-  lookupIpapiCo,
-  lookupFreeIpApi,
-  lookupReallyFreeGeoIP,
-  lookupIpiz,
+export type ProviderId =
+  | "auto"
+  | "iplocate"
+  | "ipwhois"
+  | "ip-api"
+  | "ipapi"
+  | "freeipapi"
+  | "reallyfreegeoip"
+  | "ipiz";
+
+export const PROVIDERS: { id: ProviderId; label: string }[] = [
+  { id: "auto", label: "Auto (fallback)" },
+  { id: "iplocate", label: "iplocate.io" },
+  { id: "ipwhois", label: "ipwho.is" },
+  { id: "ip-api", label: "ip-api.com" },
+  { id: "ipapi", label: "ipapi.co" },
+  { id: "freeipapi", label: "freeipapi.com" },
+  { id: "reallyfreegeoip", label: "reallyfreegeoip.org" },
+  { id: "ipiz", label: "ipiz.net" },
 ];
 
-async function lookup(ip: string): Promise<Partial<IPInfo>> {
-  for (const p of PROVIDERS) {
-    const res = await p(ip);
+const PROVIDER_MAP: Record<Exclude<ProviderId, "auto">, (ip: string) => Promise<Partial<IPInfo> | null>> = {
+  iplocate: lookupIplocate,
+  ipwhois: lookupIpwhois,
+  "ip-api": lookupIpApi,
+  ipapi: lookupIpapiCo,
+  freeipapi: lookupFreeIpApi,
+  reallyfreegeoip: lookupReallyFreeGeoIP,
+  ipiz: lookupIpiz,
+};
+
+const AUTO_ORDER: ProviderId[] = ["iplocate", "ipwhois", "ip-api", "ipapi", "freeipapi", "reallyfreegeoip", "ipiz"];
+
+async function lookup(ip: string, provider: ProviderId = "auto"): Promise<Partial<IPInfo>> {
+  if (provider !== "auto") {
+    const fn = PROVIDER_MAP[provider];
+    const res = fn ? await fn(ip) : null;
+    if (res) return res;
+  }
+  for (const id of AUTO_ORDER) {
+    if (provider !== "auto" && id === provider) continue;
+    const res = await PROVIDER_MAP[id as Exclude<ProviderId, "auto">](ip);
     if (res) return res;
   }
   return {};
 }
 
-export const getUserIP = createServerFn({ method: "GET" }).handler(async (): Promise<IPInfo> => {
-  const ip = getRequestIP({ xForwardedFor: true }) ?? null;
-  if (!ip || ip === "::1" || ip === "127.0.0.1") {
-    return { ip };
-  }
-  const info = await lookup(ip);
-  return { ip, ...info };
-});
+export const getUserIP = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) => {
+    const p = (input as { provider?: string } | undefined)?.provider as ProviderId | undefined;
+    return { provider: (p && (p === "auto" || p in PROVIDER_MAP) ? p : "auto") as ProviderId };
+  })
+  .handler(async ({ data }): Promise<IPInfo> => {
+    const ip = getRequestIP({ xForwardedFor: true }) ?? null;
+    if (!ip || ip === "::1" || ip === "127.0.0.1") {
+      return { ip };
+    }
+    const info = await lookup(ip, data.provider);
+    return { ip, ...info };
+  });
 
 const IP_RE = /^([0-9a-fA-F:.]{3,45})$/;
 const DOMAIN_RE = /^(?=.{1,253}$)([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
@@ -317,11 +351,12 @@ async function resolveDomainCheckHost(host: string): Promise<string | null> {
 
 export const lookupIP = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => {
-    const { ip } = input as { ip: string };
+    const { ip, provider } = input as { ip: string; provider?: string };
     const v = (ip ?? "").trim();
     if (!v) throw new Error("Invalid input");
     if (!IP_RE.test(v) && !DOMAIN_RE.test(v)) throw new Error("Invalid IP or domain");
-    return { ip: v };
+    const prov = (provider && (provider === "auto" || provider in PROVIDER_MAP) ? provider : "auto") as ProviderId;
+    return { ip: v, provider: prov };
   })
   .handler(async ({ data }): Promise<IPInfo> => {
     let target = data.ip;
@@ -332,6 +367,6 @@ export const lookupIP = createServerFn({ method: "GET" })
       if (!resolved) throw new Error("Could not resolve domain via check-host.net");
       target = resolved;
     }
-    const info = await lookup(target);
+    const info = await lookup(target, data.provider);
     return { ip: target, ...info, ...(host ? { host } : {}) };
   });
