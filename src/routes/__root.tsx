@@ -87,6 +87,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: "Detect your public IP address instantly and for free." },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/b2bbe39f-1137-49c0-8b66-5e1fa463c256" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/b2bbe39f-1137-49c0-8b66-5e1fa463c256" },
+      { name: "google-site-verification", content: "9bAiBCEerIAq7Gsm24epeaxgGOKO7ppTsbfFoX7I5C8" },
     ],
     links: [
       {
