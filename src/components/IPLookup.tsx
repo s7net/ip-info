@@ -171,9 +171,19 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
       <div className="relative border-b border-border/60 bg-card/60 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 text-sm">
           <span className="text-muted-foreground">Your IP:</span>
-          <span dir="ltr" className="rounded bg-primary/20 px-2 py-0.5 font-mono text-primary">
-            {me?.ip ?? "—"}
-          </span>
+          {me?.ip ? (
+            <button
+              type="button"
+              onClick={() => navigate({ to: "/$ip", params: { ip: me.ip! } })}
+              dir="ltr"
+              className="rounded bg-primary/20 px-2 py-0.5 font-mono text-primary underline-offset-2 hover:bg-primary/30 hover:underline transition"
+              aria-label="Lookup your IP"
+            >
+              {me.ip}
+            </button>
+          ) : (
+            <span dir="ltr" className="rounded bg-primary/20 px-2 py-0.5 font-mono text-primary">—</span>
+          )}
           {me?.country && (
             <span className="flex items-center gap-2 text-muted-foreground">
               Country:
