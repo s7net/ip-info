@@ -170,7 +170,7 @@ function Index() {
               Invalid IP address or lookup temporarily unavailable.
             </div>
           )}
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr]">
+          <div className="grid grid-cols-1">
             {/* Info sections */}
             <div className="divide-y divide-border">
               <div className="flex items-center justify-between gap-3 px-4 py-3">
@@ -204,15 +204,9 @@ function Index() {
                         dir={r.mono ? "ltr" : undefined}
                         className={`${r.highlight ? "font-semibold text-destructive" : "text-foreground"} ${r.mono ? "font-mono" : ""} ${!r.value ? "text-muted-foreground/60" : ""} break-all`}
                       >
-                        {(r.label === "Country") && (
-                          (sec.title === "Location" && active.country_code) ||
-                          (sec.title !== "Location" && r.value)
-                        ) ? (
+                        {(r.label === "Country" && active.country_code) ? (
                           <span className="inline-flex items-center gap-2">
-                            <Flag
-                              code={sec.title === "Location" ? active.country_code : r.value}
-                              className="h-3.5 w-5 rounded-sm"
-                            />
+                            <Flag code={active.country_code} className="h-3.5 w-5 rounded-sm" />
                             {r.value ?? "—"}
                           </span>
                         ) : (
@@ -226,17 +220,17 @@ function Index() {
             </div>
 
             {/* Map */}
-            <div className="min-h-[320px] border-t border-border md:border-l md:border-t-0">
+            <div className="border-t border-border h-64">
               {mapUrl ? (
                 <iframe
                   key={mapUrl}
                   title="Map"
                   src={mapUrl}
-                  className="h-full min-h-[320px] w-full"
+                  className="h-full w-full"
                   loading="lazy"
                 />
               ) : (
-                <div className="flex h-full min-h-[320px] items-center justify-center p-6 text-center text-sm text-muted-foreground">
+                <div className="flex h-full items-center justify-center p-6 text-center text-sm text-muted-foreground">
                   {active.ip
                     ? "Geolocation coordinates are not available for this IP."
                     : "Enter an IP address to see it on the map."}
