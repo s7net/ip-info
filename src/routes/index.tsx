@@ -2,7 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
-import { Search, X, Copy, Check } from "lucide-react";
+import {
+  Search, X, Copy, Check,
+  Globe, Network, Building2, Flag as FlagIcon, Map, MapPin,
+  Mailbox, Earth, Clock, Compass, ShieldAlert,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { getUserIP, lookupIP, type IPInfo } from "@/lib/ip.functions";
@@ -65,18 +69,26 @@ function Index() {
     setTimeout(() => setCopied(false), 1500);
   };
 
-  const rows: Array<{ label: string; value: string | null | undefined; mono?: boolean }> = [
-    { label: "IP Address", value: active.ip, mono: true },
-    { label: "ASN", value: active.asn != null ? `AS${active.asn}` : null, mono: true },
-    { label: "Organization (ISP)", value: active.org_name },
-    { label: "Country", value: active.country ? `${active.country}${active.country_code ? ` (${active.country_code})` : ""}` : null },
-    { label: "Region", value: active.region },
-    { label: "City", value: active.city },
-    { label: "Postal Code", value: active.postal },
-    { label: "Continent", value: active.continent },
-    { label: "Timezone", value: active.timezone },
-    { label: "Coordinates", value: active.latitude != null && active.longitude != null ? `${active.latitude}, ${active.longitude}` : null, mono: true },
-    { label: "Tor Network", value: active.is_tor == null ? null : active.is_tor ? "Yes" : "No" },
+  const privacyFlags = [
+    active.is_tor && "Tor",
+    active.is_vpn && "VPN",
+    active.is_proxy && "Proxy",
+    active.is_hosting && "Hosting",
+  ].filter(Boolean) as string[];
+
+  type Row = { label: string; value: string | null | undefined; mono?: boolean; icon: React.ComponentType<{ className?: string }> };
+  const rows: Row[] = [
+    { label: "IP Address", value: active.ip, mono: true, icon: Globe },
+    { label: "ASN", value: active.asn ?? null, mono: true, icon: Network },
+    { label: "Organization (ISP)", value: active.org_name, icon: Building2 },
+    { label: "Country", value: active.country ? `${active.country}${active.country_code ? ` (${active.country_code})` : ""}` : null, icon: FlagIcon },
+    { label: "Region", value: active.region, icon: Map },
+    { label: "City", value: active.city, icon: MapPin },
+    { label: "Postal Code", value: active.postal, icon: Mailbox },
+    { label: "Continent", value: active.continent, icon: Earth },
+    { label: "Timezone", value: active.timezone, icon: Clock },
+    { label: "Coordinates", value: active.latitude != null && active.longitude != null ? `${active.latitude}, ${active.longitude}` : null, mono: true, icon: Compass },
+    { label: "Privacy", value: privacyFlags.length ? privacyFlags.join(", ") : (active.ip ? "Clean" : null), icon: ShieldAlert },
   ];
 
   const lat = active.latitude;
@@ -167,8 +179,11 @@ function Index() {
                 </div>
               </div>
               {rows.map((r) => (
-                <div key={r.label} className="grid grid-cols-[110px_1fr] items-center gap-3 px-4 py-2 text-sm even:bg-muted/20">
-                  <span className="text-muted-foreground">{r.label}</span>
+                <div key={r.label} className="grid grid-cols-[160px_1fr] items-center gap-3 px-4 py-2 text-sm even:bg-muted/20">
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <r.icon className="h-4 w-4 text-primary" />
+                    {r.label}
+                  </span>
                   <span
                     dir={r.mono ? "ltr" : undefined}
                     className={`text-foreground ${r.mono ? "font-mono" : ""} ${!r.value ? "text-muted-foreground/60" : ""}`}
@@ -206,7 +221,7 @@ function Index() {
             </div>
           </div>
           <div className="border-t border-border px-4 py-2 text-center text-xs text-muted-foreground">
-            Data from <a href="https://api.ipiz.net" target="_blank" rel="noreferrer" className="text-primary hover:underline">ipiz.net</a> · Map by OpenStreetMap
+            Data from <span className="text-primary">{active.source ?? "iplocate.io"}</span> · Map by OpenStreetMap
           </div>
         </div>
       </main>
