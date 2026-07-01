@@ -160,7 +160,7 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
   const lon = active.longitude;
   const mapUrl =
     lat != null && lon != null
-      ? `https://maps.google.com/maps?q=${lat},${lon}&z=6&hl=en&output=embed`
+      ? `https://www.openstreetmap.org/export/embed.html?bbox=${lon - 2},${lat - 1.2},${lon + 2},${lat + 1.2}&layer=mapnik&marker=${lat},${lon}`
       : null;
 
   const contentKey = active.ip ?? "empty";
@@ -330,6 +330,7 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
                   title="Map"
                   src={mapUrl}
                   className="h-full w-full"
+                  style={{ filter: "invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9)" }}
                   loading="lazy"
                 />
               ) : (
