@@ -1,7 +1,7 @@
 import { useServerFn } from "@tanstack/react-start";
 import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import {
   Search, X, Copy, Check, Loader2,
   Globe, Network, Building2, Flag as FlagIcon, Map, MapPin,
@@ -42,7 +42,18 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
   });
 
   const active: IPInfo = (targetIP ? lookupQ.data : me) ?? { ip: null };
-  const loading = targetIP ? (lookupQ.isFetching || lookupQ.isPending) : false;
+  const rawLoading = targetIP ? (lookupQ.isFetching || lookupQ.isPending) : false;
+
+  // Enforce a minimum visible loading duration so the transition feels smooth
+  const [loading, setLoading] = useState(rawLoading);
+  useEffect(() => {
+    if (rawLoading) {
+      setLoading(true);
+      return;
+    }
+    const t = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(t);
+  }, [rawLoading, targetIP]);
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -223,7 +234,7 @@ export function IPLookup({ targetIP }: { targetIP?: string | null }) {
           )}
           <div
             key={contentKey}
-            className={`grid grid-cols-1 items-stretch md:grid-cols-2 animate-fade-in transition-opacity duration-300 ${loading ? "opacity-40" : "opacity-100"}`}
+            className={`grid grid-cols-1 items-stretch md:grid-cols-2 transition-all duration-700 ease-out ${loading ? "opacity-30 blur-[2px]" : "opacity-100 blur-0"}`}
           >
             <div className="col-span-1 md:col-span-2 flex items-center justify-between gap-3 border-b border-border px-4 py-3">
               <span className="text-sm font-semibold text-primary">IP Information</span>
