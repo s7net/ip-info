@@ -255,10 +255,15 @@ function extractIPv4(ip: string): string | null {
 }
 
 function pickPreferredIP(forwardedHeader: string | undefined, fallback: string | undefined): string | null {
-  const first = forwardedHeader?.split(",")[0]?.trim();
-  const ip = first ?? fallback;
-  if (!ip) return null;
-  return extractIPv4(ip) ?? ip;
+  const candidates = [
+    ...(forwardedHeader ? forwardedHeader.split(",").map((s) => s.trim()) : []),
+    ...(fallback ? [fallback] : []),
+  ].filter(Boolean);
+  for (const ip of candidates) {
+    const v4 = extractIPv4(ip);
+    if (v4) return v4;
+  }
+  return null;
 }
 
 export type ProviderId =
@@ -333,7 +338,7 @@ async function resolveDomainDoH(host: string): Promise<string | null> {
     "https://dns.google/resolve",
   ];
   for (const base of endpoints) {
-    for (const type of ["A", "AAAA"]) {
+    for (const type of ["A"]) {
       try {
         const res = await fetch(
           `${base}?name=${encodeURIComponent(host)}&type=${type}`,
