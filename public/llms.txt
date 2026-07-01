@@ -1,0 +1,8 @@
+# IP Detector
+
+> Detect your public IP address instantly and for free. Check your IPv4/IPv6, location, ISP, and connection details in one fast, privacy-friendly page.
+
+## Pages
+
+- [Home](/): Instantly see your current public IP address, location, ISP, and connection details.
+- [IP Lookup](/$ip): Look up details for any specific IP address.
