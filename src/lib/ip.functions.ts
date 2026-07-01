@@ -247,6 +247,27 @@ async function lookupReallyFreeGeoIP(ip: string): Promise<Partial<IPInfo> | null
   } catch { return null; }
 }
 
+function extractIPv4(ip: string): string | null {
+  const mapped = ip.match(/^::(?:(?:ffff|FFFF):)?(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/);
+  if (mapped) return mapped[1];
+  if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip)) return ip;
+  return null;
+}
+
+function isIPv4(ip: string): boolean {
+  return !!extractIPv4(ip);
+}
+
+function pickPreferredIP(forwardedHeader: string | undefined, fallback: string | undefined): string | null {
+  if (!forwardedHeader) return fallback ?? null;
+  const ips = forwardedHeader.split(",").map((s) => s.trim()).filter(Boolean);
+  for (const ip of ips) {
+    const ipv4 = extractIPv4(ip);
+    if (ipv4) return ipv4;
+  }
+  return ips[0] ?? fallback ?? null;
+}
+
 export type ProviderId =
   | "auto"
   | "iplocate"
